@@ -1,0 +1,69 @@
+Creaction d'une database
+GET - localhot:3000/
+    reponse 200 return all database
+
+POST - localhot:3000/
+    body json {
+        name: cinema,
+    }
+    reponse 201 return url de la database
+
+PUT - localhot:3000/
+    body json {
+        database: cinema
+        name: cinemas
+    }
+    reponse 204
+
+OPTION - localhot:3000/
+    reponse 200 return all url database
+
+
+Creaction d'une collection
+GET - localhot:3000/cinema
+    reponse 200 return all collection
+
+POST - localhot:3000/cinema
+    body json {
+        collection: movie,
+        ?datatype: {
+            id: int
+            title: string
+        }
+    }
+    reponse 201 return url de la collection
+
+PUT - localhot:3000/cinema
+    body json {
+        collection: movie,
+        ?rename: movies,
+        ?datatype: {
+            id: int
+            title: string
+            description: string
+        }
+    }
+    reponse 204
+
+DELETE - localhot:3000/cinema
+    reponse 204
+
+Creaction d'une objet
+GET - localhot:3000/cinema/movie
+    reponse 200 return all movies
+
+POST - localhot:3000/cinema/movie
+    body json {
+        name: movie
+    }
+    reponse 201 return url de la collection
+
+PUT - localhot:3000/cinema/movie
+    body json {
+        collection: movie
+        name: movies
+    }
+    reponse 204
+
+DELETE - localhot:3000/cinema/movie
+    reponse 204
