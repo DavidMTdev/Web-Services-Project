@@ -1,5 +1,5 @@
-const { LOADIPHLPAPI } = require('dns')
-const http = require('http')
+// const http = require('http')
+const serverHttp = require('./utils/server')
 
 const host = 'localhost'
 const port = 3000
@@ -65,162 +65,135 @@ const rootRouter = {
     }
 }
 
-const serverHttp = () => {
-    // const server = http.createServer()
-    const server = http.createServer((req, res) => {
-        handlerRequest(req, res)
-    })
-
-    let route = {
-        GET: {},
-        POST: {},
-        PUT: {},
-        DELETE: {},
-        OPTIONS: {}
-    }
-
-    const handlerRequest = async (req, res) => {
-        console.log(`method: ${req.method} host: ${req.headers.host} url: ${req.url}`)
-        const url = new URL(`http://${req.headers.host}${req.url}`)
-        const response = {
-            status: 200,
-            message: 'OK',
-            data: null,
-            error: null
-        }
-
-        for (const path in route[req.method]) {
-            const pathname = matchURL(path, url)
-            console.log(pathname)
-
-            if (pathname) {
-                console.log(pathname.groups)
-                const handler = route[req.method][path]
-       
-                if (handler) {
-                    await handler(req, res, response)
-                } else {
-                    response.status = 404
-                    response.message = 'Not found'
-                }
-            }
-            
-        }
-
-        res.setHeader('Content-Type', 'application/json')
-        res.writeHead(response.status)
-        res.end(JSON.stringify(response.message))
-
-        // if (response.error) {
-        //     res.end(JSON.stringify({
-        //         message: response.message,
-        //         error: response.error
-        //     }))
-        // } else {
-        //     res.end(JSON.stringify({
-        //         message: response.message,
-        //         data: response.data
-        //     }))
-        // }
-    }
-
-    const use = () => {
-        console.log('Use')
-    }
-
-    const get = (path, handler) => {
-
-        if (!route['GET']) {
-            route['GET'] = {}
-        }
-
-        if (!route['GET'][path]) {
-            route['GET'][path] = handler
-        }
-    }
-
-    const post = (path, handler) => {
-        if (!route['POST']) {
-            route['POST'] = {}
-        }
-
-        if (!route['POST'][path]) {
-            route['POST'][path] = handler
-        }
-    }
-
-    const put = (path, handler) => {
-        if (!route['PUT']) {
-            route['PUT'] = {}
-        }
-
-        if (!route['PUT'][path]) {
-            route['PUT'][path] = handler
-        }
-    }
-
-    const deleted = (path, handler) => {
-        if (!route['DELETE']) {
-            route['DELETE'] = {}
-        }
-
-        if (!route['DELETE'][path]) {
-            route['DELETE'][path] = handler
-        }
-    }
-
-    const options = (path, handler) => {
-        if (!route['OPTIONS']) {
-            route['OPTIONS'] = {}
-        }
-
-        if (!route['OPTIONS'][path]) {
-            route['OPTIONS'][path] = handler
-        }
-    }
-
-    const listen = (port, host, callback) => {
-        server.listen(port, host, callback)
-    }
-
-    return {
-        use,
-        get,
-        post,
-        put,
-        delete: deleted,
-        options,
-        listen
-    }
-}
-
-// const hendlerRequest = (req, res) => {
-//     console.log(`method: ${req.method} host: ${req.headers.host} url: ${req.url}`)
-
-//     res.setHeader('Content-Type', 'application/json')
-//     res.setHeader('Access-Control-Allow-Origin', '*')
-//     res.setHeader('Access-Control-Request-Method', '*')
-//     res.setHeader('Access-Control-Allow-Headers', '*')
-
-//     const url = new URL(`http://${req.headers.host}${req.url}`)
-//     console.log(url)
-
-//     // rootRouter.use('/', route)
-//     rootRouter.get('/', (req, res) => {
-//         console.log('Hello')
+// const serverHttp = () => {
+//     // const server = http.createServer()
+//     const server = http.createServer((req, res) => {
+//         handlerRequest(req, res)
 //     })
 
-//     const get_database = (database) => {
-//         console.log('Database')  
+//     let route = {
+//         GET: {},
+//         POST: {},
+//         PUT: {},
+//         DELETE: {},
+//         OPTIONS: {}
 //     }
 
+//     const handlerRequest = async (req, res) => {
+//         console.log(`method: ${req.method} host: ${req.headers.host} url: ${req.url}`)
+//         const url = new URL(`http://${req.headers.host}${req.url}`)
+//         const response = {
+//             status: 200,
+//             message: 'OK',
+//             data: null,
+//             error: null
+//         }
 
-//     rootRouter.get('/:database', (req, res) => {
-//         console.log(`Database: `)
-//     })
+//         for (const path in route[req.method]) {
+//             const pathname = matchURL(path, url)
+//             console.log(pathname)
 
-//     // route.use('/{database}', apiRouter)
+//             if (pathname) {
+//                 console.log(pathname.groups)
+//                 const handler = route[req.method][path]
+       
+//                 if (handler) {
+//                     await handler(req, res, response)
+//                 } else {
+//                     response.status = 404
+//                     response.message = 'Not found'
+//                 }
+//             }
+            
+//         }
+
+//         res.setHeader('Content-Type', 'application/json')
+//         res.writeHead(response.status)
+//         res.end(JSON.stringify(response.message))
+
+//         // if (response.error) {
+//         //     res.end(JSON.stringify({
+//         //         message: response.message,
+//         //         error: response.error
+//         //     }))
+//         // } else {
+//         //     res.end(JSON.stringify({
+//         //         message: response.message,
+//         //         data: response.data
+//         //     }))
+//         // }
+//     }
+
+//     const use = () => {
+//         console.log('Use')
+//     }
+
+//     const get = (path, handler) => {
+
+//         if (!route['GET']) {
+//             route['GET'] = {}
+//         }
+
+//         if (!route['GET'][path]) {
+//             route['GET'][path] = handler
+//         }
+//     }
+
+//     const post = (path, handler) => {
+//         if (!route['POST']) {
+//             route['POST'] = {}
+//         }
+
+//         if (!route['POST'][path]) {
+//             route['POST'][path] = handler
+//         }
+//     }
+
+//     const put = (path, handler) => {
+//         if (!route['PUT']) {
+//             route['PUT'] = {}
+//         }
+
+//         if (!route['PUT'][path]) {
+//             route['PUT'][path] = handler
+//         }
+//     }
+
+//     const deleted = (path, handler) => {
+//         if (!route['DELETE']) {
+//             route['DELETE'] = {}
+//         }
+
+//         if (!route['DELETE'][path]) {
+//             route['DELETE'][path] = handler
+//         }
+//     }
+
+//     const options = (path, handler) => {
+//         if (!route['OPTIONS']) {
+//             route['OPTIONS'] = {}
+//         }
+
+//         if (!route['OPTIONS'][path]) {
+//             route['OPTIONS'][path] = handler
+//         }
+//     }
+
+//     const listen = (port, host, callback) => {
+//         server.listen(port, host, callback)
+//     }
+
+//     return {
+//         use,
+//         get,
+//         post,
+//         put,
+//         delete: deleted,
+//         options,
+//         listen
+//     }
 // }
+
 
 const app = serverHttp()
 
