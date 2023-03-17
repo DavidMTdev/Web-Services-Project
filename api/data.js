@@ -1,21 +1,23 @@
 const http = require('http')
+const { exit } = require('process')
 
 const host = 'localhost'
 const port = 4001
+
 
 var databases = {
     films: {
         movies: {
             columns: {
-                id: 'int',
+                _id: 'number',
                 name: 'string'
             },
             data: [
                 {
-                    id: 1,
+                    _id: 1
                 },
                 {
-                    id: 2
+                    _id: 2
                 }
             ]
         }
@@ -25,13 +27,13 @@ var databases = {
 const hendlerRequest = (req, res) => {
     console.log(`method: ${req.method} url: ${req.url} host: ${req.headers.host}`)
     
-    var path = req.url.split('?')[0]
+    let path = req.url.split('?')[0]
 
 
-    var split = path.split('/')
-    var pathDatabase = split?.[1]
-    var Table = split?.[2]
-    var data = split?.[3]
+    let split = path.split('/')
+    let pathDatabase = split?.[1]
+    let Table = split?.[2]
+    let data = split?.[3]
 
 
     if(!databases[pathDatabase][Table][data]){
@@ -41,46 +43,82 @@ const hendlerRequest = (req, res) => {
     }
 
     if (req.method === 'POST') {
+        let columnsExist = true
+        let columnsMissed = true
+        let alreadyExist = true
+        let AttributWrongType = true
         let body = ''
         req.on('data', chunk => {
             body += chunk.toString() // convert Buffer to string
         })
         req.on('end', () => {
             const obj = JSON.parse(body)
-            console.log(databases[pathDatabase][Table]["columns"])
-
-            if (databases[pathDatabase][Table]['columns'][obj.name] != null) {
-                if (obj.name && obj.type) {
-                    const response = {
-                        description: 'Column added',
-                        column: Object(databases[pathDatabase][Table][data])
-                    }
-                    databases[pathDatabase][Table][data][obj.name] = obj.type
-                    console.log(databases);
-                    res.writeHead(201)
-                    res.end(JSON.stringify(response))
-                } else {
+            for ( let attributename in obj)
+            {
+                if(databases[pathDatabase][Table]['columns'][attributename] == null) {
+                    columnsExist = false
                     const error = {
-                        message: 'Name and Type are required'
+                        message: 'Le champ existe pas en base. Ajouter la colone avant les datas'
                     }
-
+    
                     res.writeHead(400)
                     res.end(JSON.stringify(error))
                 }
-            }else {
+
+                for (let inBd in databases[pathDatabase][Table]['data']){
+                    if( attributename.includes("_") ){
+                        if( databases[pathDatabase][Table]['data'][inBd][attributename] == obj[attributename] ){
+                            alreadyExist = false
+                            const error = {
+                                message: 'Il y a un champ unique existant deja'
+                            }
+            
+                            res.writeHead(400)
+                            res.end(JSON.stringify(error))
+                            exit
+                        }
+                    }
+                }
+
+                if(typeof obj[attributename] !=  databases[pathDatabase][Table]['columns'][attributename]){
+                    AttributWrongType = false
+                    const error = {
+                        message: "Le champ "+ attributename + " n'a pas le bon type"
+                    }
+    
+                    res.writeHead(400)
+                    res.end(JSON.stringify(error))
+                    exit
+                }
+            }
+
+            if(Object.keys(databases[pathDatabase][Table]['columns']).length != Object.keys(obj).length){
+                columnsMissed = false
                 const error = {
-                    message: 'Le champ existe pas en base. Ajouter la colone avant les datas'
+                    message: 'Il y a un champ manquant. Ajouter toutes les datas'
                 }
 
                 res.writeHead(400)
                 res.end(JSON.stringify(error))
+                exit
+            }
+
+            if (columnsExist && columnsMissed && alreadyExist && AttributWrongType) {
+                const response = {
+                    description: 'Data added',
+                    column: Object(databases[pathDatabase][Table][data])
+                }
+                databases[pathDatabase][Table][data].push(obj)
+                console.log(databases);
+                res.writeHead(201)
+                res.end(JSON.stringify(response))
             }
         })
     } 
     
     else if (req.method === 'GET'){
         const response = {
-            description: 'List of columns',
+            description: 'List of datas',
             data: Object(databases[pathDatabase][Table][data])
         }
 
