@@ -1,7 +1,7 @@
 const http = require('http')
 
 const host = 'localhost'
-const port = 4001
+const port = 4000
 
 var databases = {
     films: {

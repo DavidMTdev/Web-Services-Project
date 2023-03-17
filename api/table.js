@@ -1,7 +1,7 @@
 const http = require('http')
 
 const host = 'localhost'
-const port = 4002
+const port = 4004
 
 const databases = {
     cinema: {
