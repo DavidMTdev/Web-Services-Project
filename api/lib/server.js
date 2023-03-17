@@ -8,6 +8,11 @@ class ServerHttp {
         })
         this.port = process.env.PORT || 3000
         this.router = new Router()
+        this.dbManager = null
+    }
+
+    use(dbManager) {
+        this.dbManager = dbManager
     }
 
     route(path, router) {
@@ -22,18 +27,21 @@ class ServerHttp {
         console.log(`method: ${req.method} host: ${req.headers.host} url: ${req.url}`)
         const url = new URL(`http://${req.headers.host}${req.url}`)
         const route = this.router.routes[req.method].find(route => route.match(url))
-        const response = {
-            status: null,
-            message: null,
-        }
+        const params = route?.match(url)
         const request = {
             url,
             method: req.method,
             headers: req.headers,
             body: null,
+            params: params?.groups || null,
+        }
+        const response = {
+            status: null,
+            message: null,
         }
 
         if (route) {
+            console.log(route)
             await req.on('data', chunk => {
                 request.body = JSON.parse(chunk.toString())
             })
@@ -56,9 +64,9 @@ class ServerHttp {
         res.end(JSON.stringify(response.message))
     }
 
-    listen() {
-        this.server.listen(this.port, () => {
-            console.log(`Server running on port ${this.port}`)
+    listen(port = this.port) {
+        this.server.listen(port, () => {
+            console.log(`Server running on port ${port}`)
         })
     }
 
