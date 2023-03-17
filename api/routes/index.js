@@ -1,5 +1,5 @@
 const Router = require('../lib/router')
-const { Database, databases } = require('../db')
+const { Database, databases, existsDatabase } = require('../db')
 
 const router = new Router()
 
@@ -29,6 +29,16 @@ router.post('/', async (req, res) => {
             message: 'Database name is required'
         }
         
+        res.status = 400
+        res.message = error
+        return
+    }
+
+    if (existsDatabase(req.body.database)) {
+        const error = {
+            message: 'Database already exists'
+        }
+
         res.status = 400
         res.message = error
         return
