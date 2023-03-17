@@ -57,11 +57,27 @@ class Database {
 
 class Table {
     constructor(name) {
-        this.name = name
+        // this.name = name
         this.columns = {}
         this.data = {}
     }
 
+    getColumns() {
+        return this.columns
+    }
+
+    getColumn(name) {
+        return this.columns[name]
+    }
+
+    columnExists(name) {
+        return this.columns[name] ? true : false
+    }
+
+    createColumn(name, type, value = null, nullable = false, primaryKey = false, unique = false, autoIncrement = false) {
+        this.columns[name] = new Column(name, type, value, nullable, primaryKey, unique, autoIncrement)
+    }
+    
     insert(data) {
         this.data = data
     }
@@ -74,6 +90,66 @@ class Table {
         }
 
         return this.data
+    }
+}
+
+class Column {
+    constructor(name, type, value = null, nullable = false, primaryKey = false, unique = false, autoIncrement = false) {
+        this.name = name
+        this.type = type
+        this.nullable = nullable
+        this.default = value
+        this.primaryKey = primaryKey
+        this.unique = unique
+        this.autoIncrement = autoIncrement
+    }
+
+    setNullable(nullable) {
+        this.nullable = nullable
+    }
+
+    setDefault(defaultValue) {
+        this.default = defaultValue
+    }
+
+    setPrimaryKey(primaryKey) {
+        this.primaryKey = primaryKey
+    }
+
+    setUnique(unique) {
+        this.unique = unique
+    }
+
+    setAutoIncrement(autoIncrement) {
+        this.autoIncrement = autoIncrement
+    }
+
+    getDefault() {
+        return this.default
+    }
+
+    getType() {
+        return this.type
+    }
+
+    getName() {
+        return this.name
+    }
+
+    isNullable() {
+        return this.nullable
+    }
+
+    isPrimaryKey() {
+        return this.primaryKey
+    }
+
+    isUnique() {
+        return this.unique
+    }
+
+    isAutoIncrement() {
+        return this.autoIncrement
     }
 }
 
@@ -93,6 +169,7 @@ module.exports = {
     // DatabaseManager,
     Database, 
     Table,
+    Column,
     databases,
     existsDatabase,
     dropDatabase
