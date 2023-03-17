@@ -11,33 +11,43 @@ class ServerHttp {
     }
 
     route(path, router) {
-        this.router = {...this.router, ...router}
+        this.router.routes.GET.push(...router.routes.GET)
+        this.router.routes.POST.push(...router.routes.POST)
+        this.router.routes.PUT.push(...router.routes.PUT)
+        this.router.routes.DELETE.push(...router.routes.DELETE)
+        this.router.routes.OPTIONS.push(...router.routes.OPTIONS)
     }
 
-    handlerRequest = (req, res) => {
+    handlerRequest = async (req, res) => {
         console.log(`method: ${req.method} host: ${req.headers.host} url: ${req.url}`)
         const url = new URL(`http://${req.headers.host}${req.url}`)
-
-        console.log(this.router.routes[req.method]);
-
         const route = this.router.routes[req.method].find(route => route.match(url))
-        console.log(route)
-
         const response = {
             status: null,
             message: null,
         }
+        const request = {
+            url,
+            method: req.method,
+            headers: req.headers,
+            body: null,
+        }
 
         if (route) {
-            route.handler(req, res)
-            response.status = 200
-            response.message = {
-                message: 'OK'
-            }
+            await req.on('data', chunk => {
+                request.body = JSON.parse(chunk.toString())
+            })
+
+            await route.handler(request, response)
+
+            await req.on('error', (err) => {
+                console.error(err)
+            })
+
         } else {
             response.status = 404
             response.message = {
-                error: 'Not found'
+                error: `Not a ${req.method} request into ${req.url}`
             }
         }
         
