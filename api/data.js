@@ -109,7 +109,6 @@ const hendlerRequest = (req, res) => {
                     column: Object(databases[pathDatabase][Table][data])
                 }
                 databases[pathDatabase][Table][data].push(obj)
-                console.log(databases);
                 res.writeHead(201)
                 res.end(JSON.stringify(response))
             }
