@@ -1,18 +1,19 @@
 const urlRegExp = (path, url) => {
-    const array = path.split(/:(\w+)/)
+    const array2 = path.split("/").filter(row => row !== '')
+    // const array = path.split(/:(\w+)/)
 
     let a = '^'
-    array.forEach(row => {
-        if (row === '/') {
-            a += '\\/'
-        } else if (row === '') {
-            a += ''
-        } else if (row.split('/').length > 1) {
-            a += `\\/${row.split('/')[1]}\\/`
-        } else {
-            a += `(?<${row}>\\w+)`
-        }
-    })
+    if (array2.length === 0) {
+        a += '\\/'
+    } else {
+        array2.forEach(row => {
+            if (row.match(/:(\w+)/)) {
+                a += `\\/(?<${row.slice(1)}>\\w+)`
+            } else {
+                a += `\\/${row}`
+            }
+        })
+    }
     a += '$'
 
     const regexp = new RegExp(a)
