@@ -59,7 +59,11 @@ class Table {
     constructor(name) {
         // this.name = name
         this.columns = {}
-        this.data = {}
+        this.data = []
+    }
+
+    getData() {
+        return this.data
     }
 
     getColumns() {
@@ -76,6 +80,10 @@ class Table {
 
     createColumn(name, type, value = null, nullable = false, primaryKey = false, unique = false, autoIncrement = false) {
         this.columns[name] = new Column(name, type, value, nullable, primaryKey, unique, autoIncrement)
+    }
+
+    dropColumn(name) {
+        delete this.columns[name]
     }
     
     insert(data) {
