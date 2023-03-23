@@ -1,0 +1,568 @@
+{
+    "info": {
+        "name": "Web Services Project",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": ""
+    },
+    "item": [
+        {
+            "name": "Test",
+            "item": [
+                {
+                    "name": "201 / Create database",
+                    "request": {
+                        "method": "POST",
+                        "url": {
+                            "raw": "http://localhost:3000",
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            },
+                            "raw": "{\n  \"database\": \"cinema\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "201 | Create table films",
+                    "request": {
+                        "method": "POST",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema",
+                            "path": [
+                                "cinema"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            },
+                            "raw": "{\n  \"table\": \"films\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "201 Create table seance",
+                    "request": {
+                        "method": "POST",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema",
+                            "path": [
+                                "cinema"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            },
+                            "raw": "{\n  \"table\": \"seance\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "200 | Create columns of films",
+                    "request": {
+                        "method": "POST",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema/films",
+                            "path": [
+                                "cinema",
+                                "films"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            },
+                            "raw": "{\n  \"columns\": [\n        {\"name\":\"id\", \"type\": \"int\"}, \n        {\"name\":\"titre\", \"type\": \"string\"}, \n        {\"name\":\"duree\", \"type\": \"int\"}\n    ]\n}"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "root",
+            "item": [
+                {
+                    "name": "/",
+                    "request": {
+                        "method": "OPTIONS",
+                        "url": {
+                            "raw": "http://localhost:3000",
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        }
+                    }
+                },
+                {
+                    "name": "200 /",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "http://localhost:3000",
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        }
+                    }
+                },
+                {
+                    "name": "201 /",
+                    "request": {
+                        "method": "POST",
+                        "url": {
+                            "raw": "http://localhost:3000",
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            },
+                            "raw": "{\n  \"database\": \"cinema\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "400 /",
+                    "request": {
+                        "method": "POST",
+                        "url": {
+                            "raw": "http://localhost:3000",
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            },
+                            "raw": "{\n  \"database\": \"cinema\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "404 /",
+                    "request": {
+                        "method": "PUT",
+                        "url": {
+                            "raw": "http://localhost:3000",
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "database",
+            "item": [
+                {
+                    "name": "200 | List of methods",
+                    "request": {
+                        "method": "OPTIONS",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema",
+                            "path": [
+                                "cinema"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        }
+                    }
+                },
+                {
+                    "name": "200 | List of tables",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema",
+                            "path": [
+                                "cinema"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        }
+                    }
+                },
+                {
+                    "name": "201 | Create table films",
+                    "request": {
+                        "method": "POST",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema",
+                            "path": [
+                                "cinema"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            },
+                            "raw": "{\n  \"table\": \"films\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "400 | Create table films 2",
+                    "request": {
+                        "method": "POST",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema",
+                            "path": [
+                                "cinema"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            },
+                            "raw": "{\n  \"table\": \"films\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "200 | Delete database",
+                    "request": {
+                        "method": "DELETE",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema",
+                            "path": [
+                                "cinema"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "table",
+            "item": [
+                {
+                    "name": "200 | List of methods",
+                    "request": {
+                        "method": "OPTIONS",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema/films",
+                            "path": [
+                                "cinema",
+                                "films"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        }
+                    }
+                },
+                {
+                    "name": "200 | List of table",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema/films",
+                            "path": [
+                                "cinema",
+                                "films"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        }
+                    }
+                },
+                {
+                    "name": "200 | Create columns",
+                    "request": {
+                        "method": "POST",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema/films",
+                            "path": [
+                                "cinema",
+                                "films"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            },
+                            "raw": "{\n  \"columns\": [\n        {\"name\":\"id\", \"type\": \"int\"}, \n        {\"name\":\"titre\", \"type\": \"string\"}, \n        {\"name\":\"duree\", \"type\": \"int\"}\n    ]\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "200 | Delete table ",
+                    "request": {
+                        "method": "DELETE",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema/films",
+                            "path": [
+                                "cinema",
+                                "films"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "columns",
+            "item": [
+                {
+                    "name": "200 | List of methods",
+                    "request": {
+                        "method": "OPTIONS",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema/films/columns",
+                            "path": [
+                                "cinema",
+                                "films",
+                                "columns"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        }
+                    }
+                },
+                {
+                    "name": "200 | List of columns",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema/films/columns",
+                            "path": [
+                                "cinema",
+                                "films",
+                                "columns"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        }
+                    }
+                },
+                {
+                    "name": "200 | Add columns",
+                    "request": {
+                        "method": "PUT",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema/films/columns/id",
+                            "path": [
+                                "cinema",
+                                "films",
+                                "columns",
+                                "id"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            },
+                            "raw": "{\n  \"type\": \"int\",\n  \"nullable\": false,\n  \"primaryKey\": true,\n  \"autoIncrement\": true\n}"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "column",
+            "item": [
+                {
+                    "name": "200 | List of methods",
+                    "request": {
+                        "method": "OPTIONS",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema/films/columns/id",
+                            "path": [
+                                "cinema",
+                                "films",
+                                "columns",
+                                "id"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        }
+                    }
+                },
+                {
+                    "name": "200 | List of column",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema/films/columns/id",
+                            "path": [
+                                "cinema",
+                                "films",
+                                "columns",
+                                "id"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        }
+                    }
+                },
+                {
+                    "name": "200 | Update column",
+                    "request": {
+                        "method": "POST",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema/films/columns",
+                            "path": [
+                                "cinema",
+                                "films",
+                                "columns"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            },
+                            "raw": "{\n  \"name\": {\n    \"type\": \"string\",\n    \"nullable\": true,\n    \"default\": null,\n    \"primaryKey\": false,\n    \"unique\": false,\n    \"autoIncrement\": false\n  },\n  \"vote\": {\n    \"type\": \"int\"\n  }\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "200 | Delete column",
+                    "request": {
+                        "method": "DELETE",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema/films/columns/id",
+                            "path": [
+                                "cinema",
+                                "films",
+                                "columns",
+                                "id"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
