@@ -62,6 +62,10 @@ class Table {
         this.data = {}
     }
 
+    getData() {
+        return this.data
+    }
+
     getColumns() {
         return this.columns
     }

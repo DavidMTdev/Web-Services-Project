@@ -7,6 +7,8 @@ const urlRegExp = (path, url) => {
             a += '\\/'
         } else if (row === '') {
             a += ''
+        } else if (row.split('/').length > 1) {
+            a += `\\/${row.split('/')[1]}\\/`
         } else {
             a += `(?<${row}>\\w+)`
         }
