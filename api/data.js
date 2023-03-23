@@ -63,6 +63,7 @@ const hendlerRequest = (req, res) => {
     
                     res.writeHead(400)
                     res.end(JSON.stringify(error))
+                    return
                 }
 
                 for (let inBd in databases[pathDatabase][Table]['data']){
@@ -75,7 +76,7 @@ const hendlerRequest = (req, res) => {
             
                             res.writeHead(400)
                             res.end(JSON.stringify(error))
-                            exit
+                            return
                         }
                     }
                 }
@@ -88,7 +89,7 @@ const hendlerRequest = (req, res) => {
     
                     res.writeHead(400)
                     res.end(JSON.stringify(error))
-                    exit
+                    return
                 }
             }
 
@@ -100,7 +101,7 @@ const hendlerRequest = (req, res) => {
 
                 res.writeHead(400)
                 res.end(JSON.stringify(error))
-                exit
+                return
             }
 
             if (columnsExist && columnsMissed && alreadyExist && AttributWrongType) {
