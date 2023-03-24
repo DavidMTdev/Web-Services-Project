@@ -3,17 +3,17 @@ const { databases } = require('../db')
 
 const router = new Router()
 
-router.options('/:database/:table/columns', (req, res) => {
+router.options('/:database/:table/data', (req, res) => {
     const response = {
         description: 'List of methods',
-        methods: ['GET', 'POST']
+        methods: ['GET','POST','DELETE']
     }
 
     res.status = 200
     res.message = response
 })
 
-router.get('/:database/:table/columns', (req, res) => {
+router.get('/:database/:table/data', (req, res) => {
     const db = databases()[req.params.database]
 
     if (!db) {
@@ -39,15 +39,15 @@ router.get('/:database/:table/columns', (req, res) => {
     }
 
     const response = {
-        description: 'List of columns',
-        columns: Object.keys(table.getColumns())
+        description: 'List of data',
+        data: table.getData()
     }
 
     res.status = 200
     res.message = response
 })
 
-router.post('/:database/:table/columns', async (req, res) => {
+router.post('/:database/:table/data', async (req, res) => {
     const db = databases()[req.params.database]
     const body = req.body
 
@@ -73,54 +73,69 @@ router.post('/:database/:table/columns', async (req, res) => {
         return
     }
 
-    const typeArgument = {
-        string: "string",
-        int: "number",
-        float: "number",
-        bool: "boolean"
-    }
-
-    const newColumns = []
+    const data = table.getData()
+    const newData = {}
     for (const key in body) {  
         const value = body[key]
 
-        if (table.columnExists(key)) {
+        if (!table.columnExists(key)) {
             const error = {
-                message: `Column ${key} already exists`
+                message: `Column ${key} not exists`
             }
             res.status = 400
             res.message = error
             return
         }
 
-        if (!value.type) {
-            const error = {
-                message: 'type is required'
-            }
-            res.status = 400
-            res.message = error
-            return
-        }
-        
-        if (!typeArgument[value.type]) {
-            const error = {
-                message: 'type is invalid'
-            }
-            res.status = 400
-            res.message = error
-            return
-        }
-
-        newColumns.push([key, typeArgument[value.type], value?.default, value?.nullable, value?.primaryKey, value?.unique, value?.autoIncrement])
+        newData[key] = value
     }
 
-    newColumns.forEach(column => {
-        table.createColumn(...column)
-    })
+    for (const key of Object.keys(table.getColumns())) {
+        const column = table.getColumn(key)
+
+        if (!newData[key]) {
+            newData[key] = column.getDefault()
+        } 
+
+        if (column.isAutoIncrement()) {
+            newData[key] = table.getAutoIncrement()
+        }
+
+        if (!column.isNullable() && newData[key] === null) {
+            const error = {
+                message: `Column ${key} cannot be null`
+            }
+            res.status = 400
+            res.message = error
+            return
+        }
+
+        if (!column.isNullable() && column.getType() !== typeof newData[key]) {
+            const error = {
+                message: `Column ${key} must be ${column.getType()}`
+            }
+            res.status = 400
+            res.message = error
+            return
+        }
+
+        if (column.isUnique() && data.some(row => row[key] === newData[key])) {
+            const error = {
+                message: `Column ${key} must be unique`
+            }
+            res.status = 400
+            res.message = error
+            return
+        }
+    }
+
+    table.autoIncrement()
+    table.insert(newData)
 
     res.status = 200
     res.message = {
-        message: 'Columns created'
+        message: 'Data created',
+        data: newData
     }
 })
 

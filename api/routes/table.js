@@ -93,9 +93,9 @@ router.post('/:database/:table', async (req, res) => {
 
     const newColumns = []
     await req.body.columns.forEach(column => {
-        const {name, type} = column
+        const value = column
 
-        if (!name) {
+        if (!value.name) {
             const error = {
                 message: 'Column name is required'
             }
@@ -104,7 +104,7 @@ router.post('/:database/:table', async (req, res) => {
             return
         }
         
-        if (!type) {
+        if (!value.type) {
             const error = {
                 message: 'Column type is required'
             }
@@ -113,7 +113,7 @@ router.post('/:database/:table', async (req, res) => {
             return
         }
 
-        if (!typeArgument[type]) {
+        if (!typeArgument[value.type]) {
             const error = {
                 message: 'Column type is invalid'
             }
@@ -122,11 +122,11 @@ router.post('/:database/:table', async (req, res) => {
             return
         }
 
-        newColumns.push({name, type: typeArgument[type]})
+        newColumns.push([value.name, typeArgument[value.type], value?.default, value?.nullable, value?.primaryKey, value?.unique, value?.autoIncrement])
     })
     
     newColumns.forEach(column => {
-        table.createColumn(column.name, column.type)
+        table.createColumn(...column)
     })
 
     const response = {  
