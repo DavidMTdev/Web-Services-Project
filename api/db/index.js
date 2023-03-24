@@ -211,7 +211,7 @@ class Document {
     }
 
     getId() {
-        return this.id
+        return this.uuid
     }
 
     getValues() {
