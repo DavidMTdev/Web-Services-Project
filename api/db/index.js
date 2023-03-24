@@ -60,6 +60,7 @@ class Table {
         // this.name = name
         this.columns = {}
         this.data = []
+        this.count = 0
     }
 
     getData() {
@@ -74,6 +75,14 @@ class Table {
         return this.columns[name]
     }
 
+    getAutoIncrement() {
+        return this.count
+    }
+
+    autoIncrement() {
+        return this.count++
+    }
+
     columnExists(name) {
         return this.columns[name] ? true : false
     }
@@ -85,9 +94,9 @@ class Table {
     dropColumn(name) {
         delete this.columns[name]
     }
-    
+
     insert(data) {
-        this.data = data
+        this.data.push(data)
     }
 
     select(where) {
@@ -99,6 +108,28 @@ class Table {
 
         return this.data
     }
+
+    update(where, data) {
+        const rows = this.select(where)
+
+        for (const row of rows) {
+            for (const key in data) {
+                row[key] = data[key]
+            }
+        }
+    }
+
+    delete(where) {
+        const rows = this.select(where)
+
+        for (const row of rows) {
+            this.data.splice(this.data.indexOf(row), 1)
+        }
+    }
+
+    truncate() {
+        this.data = []
+    }     
 }
 
 class Column {
