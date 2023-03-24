@@ -13,7 +13,7 @@ router.options('/:database/:table/data', (req, res) => {
     res.message = response
 })
 
-router.get('/:database/:table/data', (req, res) => {
+router.get('/:database/:table/data', async (req, res) => {
     const db = databases()[req.params.database]
 
     if (!db) {
@@ -38,9 +38,16 @@ router.get('/:database/:table/data', (req, res) => {
         return
     }
 
+    const newData = {}
+    await table.getData().map(element => {
+        newData[element.getId()] = element.getValues()
+    })
+
+    console.log(newData);
+
     const response = {
         description: 'List of data',
-        data: table.getData()
+        data: newData
     }
 
     res.status = 200
