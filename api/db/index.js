@@ -1,3 +1,5 @@
+const crypto = require('crypto')
+
 const inMemory = {}
 
 // class DatabaseManager {
@@ -75,16 +77,16 @@ class Table {
         return this.columns[name]
     }
 
-    getAutoIncrement() {
+    getCount() {
         return this.count
-    }
-
-    autoIncrement() {
-        return this.count++
     }
 
     columnExists(name) {
         return this.columns[name] ? true : false
+    }
+
+    autoIncrement(column) {
+        this.columns[column].autoIncrementCount()
     }
 
     createColumn(name, type, value = null, nullable = false, primaryKey = false, unique = false, autoIncrement = false) {
@@ -96,7 +98,8 @@ class Table {
     }
 
     insert(data) {
-        this.data.push(data)
+        this.count++
+        this.data.push(new Document(data))
     }
 
     select(where) {
@@ -141,6 +144,11 @@ class Column {
         this.primaryKey = primaryKey
         this.unique = unique
         this.autoIncrement = autoIncrement
+        this.count = 0
+    }
+
+    autoIncrementCount() {
+        return this.count++
     }
 
     setNullable(nullable) {
@@ -175,6 +183,10 @@ class Column {
         return this.name
     }
 
+    getCount() {
+        return this.count
+    }
+
     isNullable() {
         return this.nullable
     }
@@ -189,6 +201,25 @@ class Column {
 
     isAutoIncrement() {
         return this.autoIncrement
+    }
+}
+
+class Document {
+    constructor(values) {
+        this.uuid = crypto.randomUUID()
+        this.values = values
+    }
+
+    getId() {
+        return this.id
+    }
+
+    getValues() {
+        return this.values
+    }
+
+    getValue(key) {
+        return this.values[key]
     }
 }
 
