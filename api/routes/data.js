@@ -98,7 +98,8 @@ router.post('/:database/:table/data', async (req, res) => {
         } 
 
         if (column.isAutoIncrement()) {
-            newData[key] = table.getAutoIncrement()
+            table.autoIncrement(key)
+            newData[key] = column.getCount()
         }
 
         if (!column.isNullable() && newData[key] === null) {
@@ -119,7 +120,7 @@ router.post('/:database/:table/data', async (req, res) => {
             return
         }
 
-        if (column.isUnique() && data.some(row => row[key] === newData[key])) {
+        if (column.isUnique() && data.some(row => row.getValue(key) === newData[key])) {
             const error = {
                 message: `Column ${key} must be unique`
             }
@@ -129,8 +130,10 @@ router.post('/:database/:table/data', async (req, res) => {
         }
     }
 
-    table.autoIncrement()
+    
     table.insert(newData)
+
+    console.log(table);
 
     res.status = 200
     res.message = {
