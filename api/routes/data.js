@@ -139,4 +139,47 @@ router.post('/:database/:table/data', async (req, res) => {
     }
 })
 
+router.delete('/:database/:table/data', (req, res) => {
+    const db = databases()[req.params.database]
+
+    if (!db) {
+        const error = {
+            message: 'Database not found'
+        }
+
+        res.status = 404
+        res.message = error
+        return
+    }
+    
+    if (!db.tableExists(req.params.table)) {
+        const error = {
+            message: 'Table not found'
+        }
+
+        res.status = 404
+        res.message = error
+        return
+    }
+
+    const table = db.getTable(req.params.table)
+    if (table.getData().length === 0) {
+        const error = {
+            message: 'Table is empty'
+        }
+
+        res.status = 400
+        res.message = error
+        return
+    }
+
+    table.truncate()
+
+    res.status = 200
+    res.message = {
+        message: 'Data deleted'
+    }
+})
+
+
 module.exports = router

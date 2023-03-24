@@ -1,7 +1,7 @@
 {
     "client": "Thunder Client",
     "collectionName": "Web Services Project",
-    "dateExported": "2023-03-24T10:14:00.288Z",
+    "dateExported": "2023-03-24T10:35:39.027Z",
     "version": "1.1",
     "folders": [
         {
@@ -259,12 +259,12 @@
             "method": "POST",
             "sortNum": 20000,
             "created": "2023-03-24T08:30:06.291Z",
-            "modified": "2023-03-24T10:04:31.342Z",
+            "modified": "2023-03-24T10:34:55.364Z",
             "headers": [],
             "params": [],
             "body": {
                 "type": "json",
-                "raw": "{\n  \"titre\": \"Mon super titre\",\n  \"duree\": 2,\n  \"vote\": 32332\n}",
+                "raw": "{\n  \"titre\": \"Mon super titre\",\n  \"duree\": 2\n}",
                 "form": []
             },
             "tests": []
@@ -408,6 +408,20 @@
                 "raw": "{\n  \"type\": \"int\",\n  \"nullable\": false,\n  \"primaryKey\": true,\n  \"autoIncrement\": true\n}",
                 "form": []
             },
+            "tests": []
+        },
+        {
+            "_id": "69b9da28-0fbe-47b5-ba76-bad195fcb102",
+            "colId": "3c417d9d-50d0-40b9-947d-4d2194768093",
+            "containerId": "5f3e760a-7de8-4b08-829d-1d768a50ca9a",
+            "name": "200 | Delete data",
+            "url": "http://localhost:3000/cinema/films/data",
+            "method": "DELETE",
+            "sortNum": 30000,
+            "created": "2023-03-24T10:34:03.124Z",
+            "modified": "2023-03-24T10:34:22.079Z",
+            "headers": [],
+            "params": [],
             "tests": []
         },
         {
