@@ -1,7 +1,7 @@
 {
     "client": "Thunder Client",
     "collectionName": "Web Services Project",
-    "dateExported": "2023-03-24T10:35:39.027Z",
+    "dateExported": "2023-03-24T14:11:02.536Z",
     "version": "1.1",
     "folders": [
         {
@@ -55,6 +55,13 @@
             "containerId": "",
             "created": "2023-03-24T08:23:38.203Z",
             "sortNum": 60000
+        },
+        {
+            "_id": "26162bdc-dfff-448c-b462-58a77c26b18f",
+            "name": "document",
+            "containerId": "",
+            "created": "2023-03-24T10:37:06.137Z",
+            "sortNum": 70000
         }
     ],
     "requests": [
@@ -143,6 +150,20 @@
             "sortNum": 10000,
             "created": "2023-03-24T08:23:43.649Z",
             "modified": "2023-03-24T08:23:57.523Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "651466de-09de-419f-b97b-35cd1729e059",
+            "colId": "3c417d9d-50d0-40b9-947d-4d2194768093",
+            "containerId": "26162bdc-dfff-448c-b462-58a77c26b18f",
+            "name": "200 | List of methods",
+            "url": "http://localhost:3000/cinema/films/data/bffe199692194fcdbf3312afae746b62",
+            "method": "OPTIONS",
+            "sortNum": 10000,
+            "created": "2023-03-24T11:45:17.180Z",
+            "modified": "2023-03-24T12:11:24.602Z",
             "headers": [],
             "params": [],
             "tests": []
@@ -270,6 +291,20 @@
             "tests": []
         },
         {
+            "_id": "c83e6901-abfb-457f-abc6-ffc5e079671e",
+            "colId": "3c417d9d-50d0-40b9-947d-4d2194768093",
+            "containerId": "26162bdc-dfff-448c-b462-58a77c26b18f",
+            "name": "200 | List of Document",
+            "url": "http://localhost:3000/cinema/films/data/97bade0035094117bb0087f20436e23c",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2023-03-24T11:46:29.757Z",
+            "modified": "2023-03-24T14:07:32.305Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
             "_id": "463641e6-e96a-4a62-a100-e6f4c2010b1e",
             "colId": "3c417d9d-50d0-40b9-947d-4d2194768093",
             "containerId": "b99c9e9f-5908-4dff-b776-c0d0723b1299",
@@ -322,6 +357,25 @@
             "body": {
                 "type": "json",
                 "raw": "{\n  \"name\": {\n    \"type\": \"string\",\n    \"nullable\": true,\n    \"default\": null,\n    \"primaryKey\": false,\n    \"unique\": false,\n    \"autoIncrement\": false\n  },\n  \"vote\": {\n    \"type\": \"int\"\n  }\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "5f76e0d7-b884-4dd9-8546-6ecd0534a95a",
+            "colId": "3c417d9d-50d0-40b9-947d-4d2194768093",
+            "containerId": "26162bdc-dfff-448c-b462-58a77c26b18f",
+            "name": "200 | Update Document",
+            "url": "http://localhost:3000/cinema/films/data/9efd3220968f4dc6b6ce07e24be3f0f4",
+            "method": "PUT",
+            "sortNum": 25000,
+            "created": "2023-03-24T13:23:27.710Z",
+            "modified": "2023-03-24T14:10:17.034Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"titre\": \"Update titre\",\n  \"duree\": 4\n}",
                 "form": []
             },
             "tests": []
@@ -425,6 +479,20 @@
             "tests": []
         },
         {
+            "_id": "9fab5e5b-0693-418a-bc71-f9664fffc9da",
+            "colId": "3c417d9d-50d0-40b9-947d-4d2194768093",
+            "containerId": "26162bdc-dfff-448c-b462-58a77c26b18f",
+            "name": "200 | Delete Document",
+            "url": "http://localhost:3000/cinema/films/data/bbc3a06d1dcc43b497460720a44520e8",
+            "method": "DELETE",
+            "sortNum": 30000,
+            "created": "2023-03-24T13:23:02.731Z",
+            "modified": "2023-03-24T13:51:31.855Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
             "_id": "84c92dfd-448a-4d3c-bbf2-2c7c13cd6cb8",
             "colId": "3c417d9d-50d0-40b9-947d-4d2194768093",
             "containerId": "b99c9e9f-5908-4dff-b776-c0d0723b1299",
@@ -488,6 +556,25 @@
             "modified": "2023-03-23T15:43:52.605Z",
             "headers": [],
             "params": [],
+            "tests": []
+        },
+        {
+            "_id": "f4261350-fd73-473a-9f88-7b0d8d6767b0",
+            "colId": "3c417d9d-50d0-40b9-947d-4d2194768093",
+            "containerId": "bd7923de-ae6b-4e3f-b064-50611c0c4bfb",
+            "name": "200 | Create data",
+            "url": "http://localhost:3000/cinema/films/data",
+            "method": "POST",
+            "sortNum": 40000,
+            "created": "2023-03-24T10:37:18.429Z",
+            "modified": "2023-03-24T10:37:20.876Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"titre\": \"Mon super titre\",\n  \"duree\": 2\n}",
+                "form": []
+            },
             "tests": []
         },
         {
