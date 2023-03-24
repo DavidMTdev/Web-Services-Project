@@ -629,7 +629,26 @@
                                     "language": "json"
                                 }
                             },
-                            "raw": "{\n  \"titre\": \"Mon super titre\",\n  \"duree\": 2,\n  \"vote\": 32332\n}"
+                            "raw": "{\n  \"titre\": \"Mon super titre\",\n  \"duree\": 2\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "200 | Delete data",
+                    "request": {
+                        "method": "DELETE",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema/films/data",
+                            "path": [
+                                "cinema",
+                                "films",
+                                "data"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
                         }
                     }
                 }
