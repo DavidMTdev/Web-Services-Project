@@ -3,17 +3,17 @@ const { databases } = require('../db')
 
 const router = new Router()
 
-router.options('/:database/:table/data', (req, res) => {
+router.options('/:database/:table/data/:document', (req, res) => {
     const response = {
         description: 'List of methods',
-        methods: ['GET','POST','DELETE']
+        methods: ['GET','PUT','DELETE']
     }
 
     res.status = 200
     res.message = response
 })
 
-router.get('/:database/:table/data', async (req, res) => {
+router.get('/:database/:table/data/:document', (req, res) => {
     const db = databases()[req.params.database]
 
     if (!db) {
@@ -49,21 +49,26 @@ router.get('/:database/:table/data', async (req, res) => {
         return
     }
 
-    const newData = {}
-    await data.map(element => {
-        newData[element.getId()] = element.getValues()
-    })
+    if (!data.some(row => row.getId() === req.params.document)) {
+        const error = {
+            message: 'Document not found'
+        }
+
+        res.status = 404
+        res.message = error
+        return
+    }
 
     const response = {
-        description: 'List of data',
-        data: newData
+        description: 'Values of Document',
+        values: data.find(row => row.getId() === req.params.document).getValues()
     }
 
     res.status = 200
     res.message = response
 })
 
-router.post('/:database/:table/data', async (req, res) => {
+router.put('/:database/:table/data/:document', (req, res) => {
     const db = databases()[req.params.database]
     const body = req.body
 
@@ -90,99 +95,7 @@ router.post('/:database/:table/data', async (req, res) => {
     }
 
     const data = table.getData()
-    const newData = {}
-    for (const key in body) {  
-        const value = body[key]
-
-        if (!table.columnExists(key)) {
-            const error = {
-                message: `Column ${key} not exists`
-            }
-            res.status = 400
-            res.message = error
-            return
-        }
-
-        newData[key] = value
-    }
-
-    for (const key of Object.keys(table.getColumns())) {
-        const column = table.getColumn(key)
-
-        if (!newData[key]) {
-            newData[key] = column.getDefault()
-        } 
-
-        if (column.isAutoIncrement()) {
-            table.autoIncrement(key)
-            newData[key] = column.getCount()
-        }
-
-        if (!column.isNullable() && newData[key] === null) {
-            const error = {
-                message: `Column ${key} cannot be null`
-            }
-            res.status = 400
-            res.message = error
-            return
-        }
-
-        if (!column.isNullable() && column.getType() !== typeof newData[key]) {
-            const error = {
-                message: `Column ${key} must be ${column.getType()}`
-            }
-            res.status = 400
-            res.message = error
-            return
-        }
-
-        if (column.isUnique() && data.some(row => row.getValue(key) === newData[key])) {
-            const error = {
-                message: `Column ${key} must be unique`
-            }
-            res.status = 400
-            res.message = error
-            return
-        }
-    }
-
-    
-    table.insert(newData)
-
-    console.log(table);
-
-    res.status = 200
-    res.message = {
-        message: 'Data created',
-        data: newData
-    }
-})
-
-router.delete('/:database/:table/data', (req, res) => {
-    const db = databases()[req.params.database]
-
-    if (!db) {
-        const error = {
-            message: 'Database not found'
-        }
-
-        res.status = 404
-        res.message = error
-        return
-    }
-    
-    if (!db.tableExists(req.params.table)) {
-        const error = {
-            message: 'Table not found'
-        }
-
-        res.status = 404
-        res.message = error
-        return
-    }
-
-    const table = db.getTable(req.params.table)
-    if (table.getData().length === 0) {
+    if (data.length === 0) {
         const error = {
             message: 'Table is empty'
         }
@@ -192,12 +105,127 @@ router.delete('/:database/:table/data', (req, res) => {
         return
     }
 
-    table.truncate()
+    if (!table.findOne(row => row.getId() === req.params.document)) {
+        const error = {
+            message: 'Document not found'
+        }
 
-    res.status = 200
-    res.message = {
-        message: 'Data deleted'
+        res.status = 404
+        res.message = error
+        return
     }
+
+    if (!body) {
+        const error = {
+            message: 'Body is empty'
+        }
+
+        res.status = 400
+        res.message = error
+        return
+    }
+
+    for (const key of Object.keys(body)) {
+        console.log(key, body[key])
+
+        if (!table.columnExists(key)) {
+            const error = {
+                message: `Column ${key} not exists`
+            }
+            res.status = 400
+            res.message = error
+            return
+        }
+        const column = table.getColumn(key)
+        const row = table.findOne(row => row.getId() === req.params.document)
+
+        if (!column.isNullable() && body[key] === null) {
+            const error = {
+                message: `Column ${key} cannot be null`
+            }
+            res.status = 400
+            res.message = error
+            return
+        }
+
+        if (!column.isNullable() && column.getType() !== typeof body[key]) {
+            const error = {
+                message: `Column ${key} must be ${column.getType()}`
+            }
+            res.status = 400
+            res.message = error
+            return
+        }
+
+        if (column.isUnique() && row.getValue(key) === body[key]) {
+            const error = {
+                message: `Column ${key} must be unique`
+            }
+            res.status = 400
+            res.message = error
+            return
+        }
+    }
+
+    table.update(row => row.getId() === req.params.document, body)
+
+    const response = {
+        description: 'Document updated',
+    }
+    res.status = 200
+    res.message = response
+})
+
+router.delete('/:database/:table/data/:document', (req, res) => {
+    const db = databases()[req.params.database]
+    if (!db) {
+        const error = {
+            message: 'Database not found'
+        }
+
+        res.status = 404
+        res.message = error
+        return
+    }
+
+    const table = db.getTable(req.params.table)
+    if (!table) {
+        const error = {
+            message: 'Table not found'
+        }
+
+        res.status = 404
+        res.message = error
+        return
+    }
+
+    const data = table.getData()
+    if (data.length === 0) {
+        const error = {
+            message: 'Table is empty'
+        }
+
+        res.status = 400
+        res.message = error
+        return
+    }
+
+    if (!table.findOne(row => row.getId() === req.params.document)) {
+        const error = {
+            message: 'Document not found'
+        }
+        res.status = 404
+        res.message = error
+        return
+    }
+
+    table.delete(row => row.getId() === req.params.document)
+
+    const response = {
+        description: 'Document deleted',
+    }
+    res.status = 200
+    res.message = response
 })
 
 

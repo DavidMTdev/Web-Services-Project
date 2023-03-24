@@ -85,6 +85,13 @@ class Table {
         return this.columns[name] ? true : false
     }
 
+    documentExists(value) {
+        return this.data.filter((row) => {
+            return row.getId() === value
+        }).length > 0
+    }
+
+
     autoIncrement(column) {
         this.columns[column].autoIncrementCount()
     }
@@ -102,28 +109,34 @@ class Table {
         this.data.push(new Document(data))
     }
 
-    select(where) {
+    findOne(where) {
         if (where) {
-            return this.data.filter((row) => {
-                return row[where.key] === where.value
-            })
+            return this.data.find(row => where(row))
+        }
+
+        return this.data[0]
+    }
+
+    find(where) {
+        if (where) {
+            return this.data.filter(row => where(row))
         }
 
         return this.data
     }
 
     update(where, data) {
-        const rows = this.select(where)
+        const rows = this.find(row => where(row))
 
         for (const row of rows) {
             for (const key in data) {
-                row[key] = data[key]
+                row.setValue(key, data[key])
             }
         }
-    }
+    } 
 
     delete(where) {
-        const rows = this.select(where)
+        const rows = this.find(row => where(row))
 
         for (const row of rows) {
             this.data.splice(this.data.indexOf(row), 1)
@@ -211,7 +224,7 @@ class Document {
     }
 
     getId() {
-        return this.uuid
+        return this.uuid.replaceAll("-", "")
     }
 
     getValues() {
@@ -220,6 +233,10 @@ class Document {
 
     getValue(key) {
         return this.values[key]
+    }
+
+    setValue(key, value) {
+        this.values[key] = value
     }
 }
 
