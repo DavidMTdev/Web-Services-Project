@@ -1,3 +1,5 @@
+const crypto = require('crypto')
+
 const inMemory = {}
 
 // class DatabaseManager {
@@ -75,16 +77,23 @@ class Table {
         return this.columns[name]
     }
 
-    getAutoIncrement() {
+    getCount() {
         return this.count
-    }
-
-    autoIncrement() {
-        return this.count++
     }
 
     columnExists(name) {
         return this.columns[name] ? true : false
+    }
+
+    documentExists(value) {
+        return this.data.filter((row) => {
+            return row.getId() === value
+        }).length > 0
+    }
+
+
+    autoIncrement(column) {
+        this.columns[column].autoIncrementCount()
     }
 
     createColumn(name, type, value = null, nullable = false, primaryKey = false, unique = false, autoIncrement = false) {
@@ -96,31 +105,38 @@ class Table {
     }
 
     insert(data) {
-        this.data.push(data)
+        this.count++
+        this.data.push(new Document(data))
     }
 
-    select(where) {
+    findOne(where) {
         if (where) {
-            return this.data.filter((row) => {
-                return row[where.key] === where.value
-            })
+            return this.data.find(row => where(row))
+        }
+
+        return this.data[0]
+    }
+
+    find(where) {
+        if (where) {
+            return this.data.filter(row => where(row))
         }
 
         return this.data
     }
 
     update(where, data) {
-        const rows = this.select(where)
+        const rows = this.find(row => where(row))
 
         for (const row of rows) {
             for (const key in data) {
-                row[key] = data[key]
+                row.setValue(key, data[key])
             }
         }
-    }
+    } 
 
     delete(where) {
-        const rows = this.select(where)
+        const rows = this.find(row => where(row))
 
         for (const row of rows) {
             this.data.splice(this.data.indexOf(row), 1)
@@ -141,6 +157,11 @@ class Column {
         this.primaryKey = primaryKey
         this.unique = unique
         this.autoIncrement = autoIncrement
+        this.count = 0
+    }
+
+    autoIncrementCount() {
+        return this.count++
     }
 
     setNullable(nullable) {
@@ -175,6 +196,10 @@ class Column {
         return this.name
     }
 
+    getCount() {
+        return this.count
+    }
+
     isNullable() {
         return this.nullable
     }
@@ -189,6 +214,29 @@ class Column {
 
     isAutoIncrement() {
         return this.autoIncrement
+    }
+}
+
+class Document {
+    constructor(values) {
+        this.uuid = crypto.randomUUID()
+        this.values = values
+    }
+
+    getId() {
+        return this.uuid.replaceAll("-", "")
+    }
+
+    getValues() {
+        return this.values
+    }
+
+    getValue(key) {
+        return this.values[key]
+    }
+
+    setValue(key, value) {
+        this.values[key] = value
     }
 }
 
