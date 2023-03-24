@@ -109,6 +109,34 @@
                             "raw": "{\n  \"columns\": [\n        {\n          \"name\":\"id\", \n          \"type\": \"int\",\n          \"primaryKey\": true,\n          \"unique\": true,\n          \"autoIncrement\": true\n        }, \n        {\n          \"name\":\"titre\", \n          \"type\": \"string\"\n          \n        }, \n        {\n          \"name\":\"duree\", \n          \"type\": \"int\"\n          \n        }\n    ]\n}"
                         }
                     }
+                },
+                {
+                    "name": "200 | Create data",
+                    "request": {
+                        "method": "POST",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema/films/data",
+                            "path": [
+                                "cinema",
+                                "films",
+                                "data"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            },
+                            "raw": "{\n  \"titre\": \"Mon super titre\",\n  \"duree\": 2\n}"
+                        }
+                    }
                 }
             ]
         },
@@ -643,6 +671,100 @@
                                 "cinema",
                                 "films",
                                 "data"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "document",
+            "item": [
+                {
+                    "name": "200 | List of methods",
+                    "request": {
+                        "method": "OPTIONS",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema/films/data/bffe199692194fcdbf3312afae746b62",
+                            "path": [
+                                "cinema",
+                                "films",
+                                "data",
+                                "bffe199692194fcdbf3312afae746b62"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        }
+                    }
+                },
+                {
+                    "name": "200 | List of Document",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema/films/data/97bade0035094117bb0087f20436e23c",
+                            "path": [
+                                "cinema",
+                                "films",
+                                "data",
+                                "97bade0035094117bb0087f20436e23c"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        }
+                    }
+                },
+                {
+                    "name": "200 | Update Document",
+                    "request": {
+                        "method": "PUT",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema/films/data/9efd3220968f4dc6b6ce07e24be3f0f4",
+                            "path": [
+                                "cinema",
+                                "films",
+                                "data",
+                                "9efd3220968f4dc6b6ce07e24be3f0f4"
+                            ],
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000"
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            },
+                            "raw": "{\n  \"titre\": \"Update titre\",\n  \"duree\": 4\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "200 | Delete Document",
+                    "request": {
+                        "method": "DELETE",
+                        "url": {
+                            "raw": "http://localhost:3000/cinema/films/data/bbc3a06d1dcc43b497460720a44520e8",
+                            "path": [
+                                "cinema",
+                                "films",
+                                "data",
+                                "bbc3a06d1dcc43b497460720a44520e8"
                             ],
                             "protocol": "http",
                             "host": [
