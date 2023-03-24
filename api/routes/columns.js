@@ -111,7 +111,7 @@ router.post('/:database/:table/columns', async (req, res) => {
             return
         }
 
-        newColumns.push([key, typeArgument[value.type], value?.nullable, value?.default, value?.primaryKey, value?.unique, value?.autoIncrement])
+        newColumns.push([key, typeArgument[value.type], value?.default, value?.nullable, value?.primaryKey, value?.unique, value?.autoIncrement])
     }
 
     newColumns.forEach(column => {
