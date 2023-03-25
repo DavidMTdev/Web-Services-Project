@@ -71,6 +71,17 @@ const hendlerRequest = (req, res) => {
 
 const server = http.createServer(hendlerRequest)
 
+server.on('error', (err) => {
+    console.error(err)
+})
+
+
+server.on('close', () => {
+    console.log('Server close')
+})
+
 server.listen(port, host, () => {
     console.log(`Server running at http://${host}:${port}/`)
 })
+
+server.close()

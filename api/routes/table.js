@@ -122,12 +122,23 @@ router.post('/:database/:table', async (req, res) => {
             return
         }
 
-        newColumns.push([value.name, typeArgument[value.type], value?.default, value?.nullable, value?.primaryKey, value?.unique, value?.autoIncrement])
+        // newColumns.push([value.name, typeArgument[value.type], value?.default, value?.nullable, value?.primaryKey, value?.unique, value?.autoIncrement])
+        newColumns.push({
+            name: value.name,
+            type: typeArgument[value.type],
+            default: value?.default,
+            nullable: value?.nullable,
+            primaryKey: value?.primaryKey,
+            unique: value?.unique,
+            autoIncrement: value?.autoIncrement
+        })
     })
     
     newColumns.forEach(column => {
-        table.createColumn(...column)
+        table.createColumn(column.name, column.type, column.value, column.nullable, column.primaryKey, column.unique, column.autoIncrement)
     })
+
+    console.log(table);
 
     const response = {  
         description: 'Columns created',
