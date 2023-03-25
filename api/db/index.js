@@ -96,8 +96,14 @@ class Table {
         this.columns[column].autoIncrementCount()
     }
 
-    createColumn(name, type, value = null, nullable = false, primaryKey = false, unique = false, autoIncrement = false) {
-        this.columns[name] = new Column(name, type, value, nullable, primaryKey, unique, autoIncrement)
+    createColumn(name, type, value = null, nullable = false, primaryKey = false, unique = false, autoIncrement = false, count = 0) {
+        console.log('createColumn called with name: ', name);
+        this.columns[name] = new Column(name, type, value, nullable, primaryKey, unique, autoIncrement, count)
+    }
+
+    addColumn(value) {
+        console.log('createColumn called with value: ', value);
+        this.columns[value.name] = new Column(value.name, value.type, value.default, value.nullable, value.primaryKey, value.unique, value.autoIncrement, value.count)
     }
 
     dropColumn(name) {
@@ -107,6 +113,11 @@ class Table {
     insert(data) {
         this.count++
         this.data.push(new Document(data))
+    }
+
+    insert(data, uuid) {
+        this.count++
+        this.data.push(new Document(data, uuid))
     }
 
     findOne(where) {
@@ -149,7 +160,7 @@ class Table {
 }
 
 class Column {
-    constructor(name, type, value = null, nullable = false, primaryKey = false, unique = false, autoIncrement = false) {
+    constructor(name, type, value = null, nullable = false, primaryKey = false, unique = false, autoIncrement = false, count = 0) {
         this.name = name
         this.type = type
         this.nullable = nullable
@@ -157,7 +168,7 @@ class Column {
         this.primaryKey = primaryKey
         this.unique = unique
         this.autoIncrement = autoIncrement
-        this.count = 0
+        this.count = count
     }
 
     autoIncrementCount() {
@@ -218,8 +229,8 @@ class Column {
 }
 
 class Document {
-    constructor(values) {
-        this.uuid = crypto.randomUUID()
+    constructor(values, uuid = null) {
+        this.uuid = uuid || crypto.randomUUID()
         this.values = values
     }
 
@@ -251,6 +262,12 @@ const existsDatabase = (name) => {
 const dropDatabase = (name) => {
     delete inMemory[name]
 }
+
+// const close = () => {
+//     for (const key in inMemory) {
+//         delete inMemory[key]
+//     }
+// }
 
 module.exports = {
     // DatabaseManager,

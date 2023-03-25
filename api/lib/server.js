@@ -4,7 +4,11 @@ const Router = require('./router')
 class ServerHttp {
     constructor() {
         this.server = http.createServer((req, res) => {
-            this.handlerRequest(req, res)
+            try {
+                this.handlerRequest(req, res)
+            } catch (error) {
+                console.error(error)
+            }
         })
         this.port = process.env.PORT || 3000
         this.router = new Router()
@@ -64,10 +68,8 @@ class ServerHttp {
         res.end(JSON.stringify(response.message))
     }
 
-    listen(port = this.port) {
-        this.server.listen(port, () => {
-            console.log(`Server running on port ${port}`)
-        })
+    listen(port, callback) {
+        this.server.listen(port || this.port, () => callback(port))
     }
 
 }

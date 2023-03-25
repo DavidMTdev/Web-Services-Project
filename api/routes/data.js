@@ -145,11 +145,8 @@ router.post('/:database/:table/data', async (req, res) => {
             return
         }
     }
-
     
     table.insert(newData)
-
-    console.log(table);
 
     res.status = 200
     res.message = {
