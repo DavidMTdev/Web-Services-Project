@@ -46,11 +46,11 @@ app.listen(3000, async (port) => {
             const table = db.getTable(fileName)
 
             for (const key in json.columns) {
-                table.addColumn(json.columns[key])
+                await table.addColumn(json.columns[key])
             }
 
             for (const key in json.data) {
-                table.insert(json.data[key].values, json.data[key].uuid)
+                await table.insert(json.data[key].values, json.data[key].uuid)
             }
         }
         console.log(`Database ${folder} loaded`)
