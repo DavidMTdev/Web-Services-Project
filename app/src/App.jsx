@@ -1,23 +1,15 @@
 import { useState, createContext } from 'react'
-import { useTheme } from '@mui/material/styles'
 
+import { useQuery } from "@tanstack/react-query"
+
+import axios from "axios"
+
+import { useTheme } from '@mui/material/styles'
 import Box from '@mui/material/Box'
 import CssBaseline from '@mui/material/CssBaseline'
 import List from '@mui/material/List'
-import Divider from '@mui/material/Divider'
-import IconButton from '@mui/material/IconButton'
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
-import ChevronRightIcon from '@mui/icons-material/ChevronRight'
-import ListItem from '@mui/material/ListItem'
-import ListItemButton from '@mui/material/ListItemButton'
-import ListItemIcon from '@mui/material/ListItemIcon'
-import ListItemText from '@mui/material/ListItemText'
 import InboxIcon from '@mui/icons-material/MoveToInbox'
-import MailIcon from '@mui/icons-material/Mail'
-import ExpandLess from '@mui/icons-material/ExpandLess'
-import ExpandMore from '@mui/icons-material/ExpandMore'
 import StarBorder from '@mui/icons-material/StarBorder'
-import Collapse from '@mui/material/Collapse'
 import ListSubheader from '@mui/material/ListSubheader'
 
 import AppBar from './components/AppBar'
@@ -35,9 +27,9 @@ const subheader = (
 )
 
 export default function App() {
-  const theme = useTheme();
-  const [open, setOpen] = useState(true);
-  const [data , setData] = useState([{
+  const theme = useTheme()
+  const [open, setOpen] = useState(true)
+  const [data2 , setData] = useState([{
     name: 'Database 1',
     open: true,
     tables: [
@@ -53,9 +45,17 @@ export default function App() {
     tables: []
   }
   ])
+  const { isLoading, error, data, isFetching } = useQuery({
+    queryKey: ["database"],
+    queryFn: () =>
+      axios
+        .get("http://localhost:3000")
+        .then((res) => res.data)
+        .catch((err) => console.log(err))
+  })
 
   const handleClick = (index) => {
-    const newData = [...data]
+    const newData = [...data2]
     newData[index].open = !newData[index].open
     setData(newData)
   }
@@ -79,7 +79,7 @@ export default function App() {
             aria-labelledby="nested-list-subheader"
             subheader={subheader}
           >
-            {data.map((item, index) => (
+            {data2.map((item, index) => (
               <Box key={index} >
                 { 
                   item.tables.length > 0 
