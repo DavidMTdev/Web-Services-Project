@@ -23,8 +23,16 @@ import ListSubheader from '@mui/material/ListSubheader'
 import AppBar from './components/AppBar'
 import AppDrawer from './components/AppDrawer'
 import AppMain from './components/AppMain'
+import NestedListItem from "./components/NestedListItem"
+import NestedListSubItem from './components/NestListSubItem'
 
 const AppContext = createContext(null)
+
+const subheader = (
+  <ListSubheader component="div" id="nested-list-subheader">
+    Databases
+  </ListSubheader>
+)
 
 export default function App() {
   const theme = useTheme();
@@ -47,7 +55,6 @@ export default function App() {
   ])
 
   const handleClick = (index) => {
-    console.log(index)
     const newData = [...data]
     newData[index].open = !newData[index].open
     setData(newData)
@@ -70,40 +77,28 @@ export default function App() {
           <List
             component="nav"
             aria-labelledby="nested-list-subheader"
-            subheader={
-              <ListSubheader component="div" id="nested-list-subheader">
-                Databases
-              </ListSubheader>
-            }
+            subheader={subheader}
           >
             {data.map((item, index) => (
-              <>
-                <ListItemButton  onClick={() => handleClick(index)}>
-                    <ListItemIcon>
-                      <InboxIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={item.name} />
-                    {item.open ? <ExpandLess /> : <ExpandMore />}
-                </ListItemButton>
+              <Box key={index} >
+                { 
+                  item.tables.length > 0 
+                  ? <NestedListItem text={item.name} isOpen={item.open} click={() => handleClick(index)} icon={<InboxIcon />} open /> 
+                  : <NestedListItem text={item.name} isOpen={item.open} click={() => handleClick(index)} icon={<InboxIcon />} /> 
+                }
 
-                <Collapse in={item.open} timeout="auto" unmountOnExit>
-                  <List component="div" disablePadding>
-                    {item.tables.map((table, i) => (
-                      <ListItemButton key={i} sx={{ pl: 4 }}>
-                        <ListItemIcon>
-                          <StarBorder />
-                        </ListItemIcon>
-                        <ListItemText primary={table.name} />
-                      </ListItemButton>
-                    ))}
-                  </List>
-                </Collapse>
-              </>
+                <NestedListSubItem isOpen={item.open} >
+                  {item.tables.map((table, i) => (
+                    <NestedListItem sx={{ pl: 4 }} text={table.name} icon={<StarBorder />} /> 
+                  ))}
+                </NestedListSubItem>
+
+              </Box>
             ))}
           </List>
         </AppDrawer>
         <AppMain theme={theme} open={open} />
       </Box>
     </AppContext.Provider>
-  );
+  )
 }

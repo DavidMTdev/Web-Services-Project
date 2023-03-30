@@ -1,17 +1,16 @@
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
-import InboxIcon from '@mui/icons-material/MoveToInbox'
 import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 
-const NestedListItem = ({ text, isOpen, click, open = false }) => {
+const NestedListItem = ({ sx, text, click, isOpen, open, icon }) => {
 
-  if (open) {
+  if (!open) {
     return (
-      <ListItemButton onClick={click}>
+      <ListItemButton sx={sx} onClick={click}>
         <ListItemIcon>
-          <StarBorder />
+          {icon}
         </ListItemIcon>
         <ListItemText primary={text} />
       </ListItemButton>
@@ -19,9 +18,9 @@ const NestedListItem = ({ text, isOpen, click, open = false }) => {
   }
 
   return ( 
-    <ListItemButton  onClick={click}>
+    <ListItemButton sx={sx} onClick={click}>
       <ListItemIcon>
-        <InboxIcon />
+        {icon}
       </ListItemIcon>
       <ListItemText primary={text} />
       {isOpen ? <ExpandLess /> : <ExpandMore />}
