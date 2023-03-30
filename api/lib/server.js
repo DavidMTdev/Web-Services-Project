@@ -29,6 +29,11 @@ class ServerHttp {
 
     handlerRequest = async (req, res) => {
         console.log(`method: ${req.method} host: ${req.headers.host} url: ${req.url}`)
+        res.setHeader('Access-Control-Allow-Origin', '*')
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        res.setHeader('Access-Control-Allow-Credentials', true)
+        
         const url = new URL(`http://${req.headers.host}${req.url}`)
         const route = this.router.routes[req.method].find(route => route.match(url))
         const params = route?.match(url)
