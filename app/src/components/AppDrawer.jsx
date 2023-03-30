@@ -15,7 +15,7 @@ import DrawerHeaderStyled from './styles/DrawerHeader'
 
 import { DRAWER_WIDTH } from '../constants'
 
-const AppDrawer = ({ theme, open, click }) => {
+const AppDrawer = ({ theme, open, click, children }) => {
     return ( 
         <Drawer
             sx={{
@@ -36,31 +36,7 @@ const AppDrawer = ({ theme, open, click }) => {
                 </IconButton>
             </DrawerHeaderStyled>
             <Divider />
-            <List>
-                {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-                    <ListItem key={text} disablePadding>
-                    <ListItemButton>
-                        <ListItemIcon>
-                        {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                        </ListItemIcon>
-                        <ListItemText primary={text} />
-                    </ListItemButton>
-                    </ListItem>
-                ))}
-            </List>
-            <Divider />
-            <List>
-                {['All mail', 'Trash', 'Spam'].map((text, index) => (
-                    <ListItem key={text} disablePadding>
-                    <ListItemButton>
-                        <ListItemIcon>
-                        {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                        </ListItemIcon>
-                        <ListItemText primary={text} />
-                    </ListItemButton>
-                    </ListItem>
-                ))}
-            </List>
+            {children}
         </Drawer>
     )
 }
