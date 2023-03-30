@@ -63,7 +63,6 @@ router.get('/:database/:table/data/:document', (req, res) => {
         description: 'Values of Document',
         values: data.find(row => row.getId() === req.params.document).getValues()
     }
-
     res.status = 200
     res.message = response
 })
