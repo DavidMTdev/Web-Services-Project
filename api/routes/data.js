@@ -15,7 +15,7 @@ router.options('/:database/:table/data', (req, res) => {
 
 router.get('/:database/:table/data', async (req, res) => {
     const db = databases()[req.params.database]
-
+    
     if (!db) {
         const error = {
             message: 'Database not found'
@@ -38,6 +38,36 @@ router.get('/:database/:table/data', async (req, res) => {
         return
     }
 
+    const verifTableSortExist = req.url.searchParams
+    let isSort = false
+    let tableSort = false
+    let errorName = ""
+    let SortBy = {}
+    console.log(verifTableSortExist);
+    verifTableSortExist.forEach((value, key) => {
+        const verif = table.getColumn(key)
+        isSort = true
+        SortBy[key] = value
+        if (!verif) {
+            tableSort = true
+            errorName = key
+        }
+
+    });
+
+    if (tableSort) {
+        const error = {
+            message: 'Immposible de trié par ' + errorName
+        }
+
+        res.status = 404
+        res.message = error
+        return
+    }
+
+    
+
+
     const data = table.getData()
     if (data.length === 0) {
         const error = {
@@ -50,9 +80,21 @@ router.get('/:database/:table/data', async (req, res) => {
     }
 
     const newData = {}
-    await data.map(element => {
-        newData[element.getId()] = element.getValues()
+    if (isSort) {
+        for (elem in SortBy){
+            await data.map(element => {
+                if (element.getValues()[elem] == SortBy[elem]){
+                    newData[element.getId()] = element.getValues()
+                }
+            })
+        }
+    }
+    else{
+        await data.map(element => {
+            newData[element.getId()] = element.getValues()
     })
+    }
+    
 
     const response = {
         description: 'List of data',
