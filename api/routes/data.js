@@ -38,21 +38,24 @@ router.get('/:database/:table/data', async (req, res) => {
         return
     }
 
-    const verifTableSortExist = req.url.searchParams
-    let isSort = false
+    const verifFilter = req.url.searchParams
+    const sortBy = {}
     let tableSort = false
     let errorName = ""
-    let SortBy = {}
-    console.log(verifTableSortExist);
-    verifTableSortExist.forEach((value, key) => {
-        const verif = table.getColumn(key)
-        isSort = true
-        SortBy[key] = value
-        if (!verif) {
+
+    verifFilter.forEach((value, key) => {
+        if (key != "filter"){
             tableSort = true
             errorName = key
         }
+        let filter
+        filter = value
 
+        let x = filter.split(',')
+        for( element in x){
+            let y = x[element].split('=')
+            sortBy[y[0]] = y[1] 
+        }
     });
 
     if (tableSort) {
@@ -80,13 +83,20 @@ router.get('/:database/:table/data', async (req, res) => {
     }
 
     const newData = {}
-    if (isSort) {
-        for (elem in SortBy){
+    if (sortBy != {}) {
+        for (elem in sortBy){
             await data.map(element => {
-                if (element.getValues()[elem] == SortBy[elem]){
+                if (element.getValues()[elem] == sortBy[elem]){
                     newData[element.getId()] = element.getValues()
                 }
             })
+        }
+        for (x in newData){
+            for (elem in sortBy){
+                if (newData[x][elem] != sortBy[elem]){
+                    delete newData[x]
+                }
+            }
         }
     }
     else{
