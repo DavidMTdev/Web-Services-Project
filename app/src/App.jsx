@@ -1,6 +1,6 @@
-import { useState, createContext } from 'react'
+import { useState, createContext, Suspense, useEffect } from 'react'
 
-import { useQuery } from "@tanstack/react-query"
+import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query"
 
 import axios from "axios"
 
@@ -11,12 +11,22 @@ import List from '@mui/material/List'
 import InboxIcon from '@mui/icons-material/MoveToInbox'
 import StarBorder from '@mui/icons-material/StarBorder'
 import ListSubheader from '@mui/material/ListSubheader'
+import TextField from '@mui/material/TextField'
+import Divider from '@mui/material/Divider'
+import IconButton from '@mui/material/IconButton'
+import DirectionsIcon from '@mui/icons-material/Directions'
+import Skeleton from '@mui/material/Skeleton'
+import Button from '@mui/material/Button'
+import SendIcon from '@mui/icons-material/Send'
+import Stack from '@mui/material/Stack'
 
 import AppBar from './components/AppBar'
 import AppDrawer from './components/AppDrawer'
 import AppMain from './components/AppMain'
 import NestedListItem from "./components/NestedListItem"
 import NestedListSubItem from './components/NestListSubItem'
+
+import { getDatabases, getTables } from './api/root'
 
 const AppContext = createContext(null)
 
@@ -26,36 +36,68 @@ const subheader = (
   </ListSubheader>
 )
 
+const Loading = () => {
+  return (
+    <Skeleton variant="rounded" width={220} height={60} />
+  )
+}
+
 export default function App() {
   const theme = useTheme()
+  const queryClient = useQueryClient()
   const [open, setOpen] = useState(true)
-  const [data2 , setData] = useState([{
-    name: 'Database 1',
-    open: true,
-    tables: [
-      {
-        name: 'Table 1'
-      }, {
-        name: 'Table 2'
-      }
-    ]
-  }, {
-    name: 'Database 2',
-    open: false,
-    tables: []
-  }
-  ])
-  const { isLoading, error, data, isFetching } = useQuery({
-    queryKey: ["database"],
-    queryFn: () =>
-      axios
-        .get("http://localhost:3000")
-        .then((res) => res.data)
-        .catch((err) => console.log(err))
+  const [data , setData] = useState([])
+  const databasesQuery = useQuery({
+    queryKey: ["GET /"],
+    queryFn: getDatabases,
+    onSuccess: (res) => {
+      const newData = res.databases.map((item) => {
+        return {
+          name: item,
+          open: false,
+          tables: []
+        }
+      })
+      setData([...newData])
+    },  
+    initialData: () => {
+      return data
+    }
   })
 
+  const tableQueries = useQueries({
+    queries: data.map((database) => {
+      return {
+        queryKey: ["GET /", database.name],
+        queryFn: () => getTables(database.name),
+
+        onSuccess: (res) => {
+          const dataIndex = data.findIndex((item) => item.name === database.name)
+          const newData = [...data]
+          res.tables.map((item) => {
+            newData[dataIndex].tables.push({
+              name: item,
+              columns: {},
+              data: []
+            })
+          })
+          setData([...newData])
+        },
+        initialData: () => {
+          return data[data.findIndex((item) => item.name === database.name)]
+        },
+        enabled: databasesQuery.status === "success"
+      }
+    })
+  })
+
+  // useEffect(() => {
+  //   console.log(`data`)
+  //   console.log(data)
+  // }, [data])
+
   const handleClick = (index) => {
-    const newData = [...data2]
+    const newData = [...data]
     newData[index].open = !newData[index].open
     setData(newData)
   }
@@ -74,27 +116,41 @@ export default function App() {
         <CssBaseline />
         <AppBar theme={theme} open={open} click={handleDrawerOpen} />
         <AppDrawer theme={theme} open={open} click={handleDrawerClose} >
+          <Stack 
+            component="form"
+            direction="row"
+            spacing={0}
+            margin={2}
+            noValidate
+            autoComplete="off"
+          >
+            <TextField fullWidth id="outlined-basic" label="Outlined" variant="outlined" />
+            <Button variant="contained" endIcon={<SendIcon />} />
+          </Stack >
           <List
             component="nav"
             aria-labelledby="nested-list-subheader"
             subheader={subheader}
           >
-            {data2.map((item, index) => (
-              <Box key={index} >
-                { 
-                  item.tables.length > 0 
-                  ? <NestedListItem text={item.name} isOpen={item.open} click={() => handleClick(index)} icon={<InboxIcon />} open /> 
-                  : <NestedListItem text={item.name} isOpen={item.open} click={() => handleClick(index)} icon={<InboxIcon />} /> 
-                }
+            <Suspense fallback={<Loading />}>
 
-                <NestedListSubItem isOpen={item.open} >
-                  {item.tables.map((table, i) => (
-                    <NestedListItem sx={{ pl: 4 }} text={table.name} icon={<StarBorder />} /> 
-                  ))}
-                </NestedListSubItem>
+              {data.map((item, index) => (
+                <Box key={index} >
+                  { 
+                    item.tables.length > 0 
+                    ? <NestedListItem text={item.name} isOpen={item.open} click={() => handleClick(index)} icon={<InboxIcon />} open /> 
+                    : <NestedListItem text={item.name} isOpen={item.open} click={() => handleClick(index)} icon={<InboxIcon />} /> 
+                  }
 
-              </Box>
-            ))}
+                  <NestedListSubItem isOpen={item.open} >
+                    {item.tables.map((table, i) => (
+                      <NestedListItem sx={{ pl: 4 }} text={table.name} icon={<StarBorder />} /> 
+                    ))}
+                  </NestedListSubItem>
+
+                </Box>
+              ))}
+            </Suspense>
           </List>
         </AppDrawer>
         <AppMain theme={theme} open={open} />
