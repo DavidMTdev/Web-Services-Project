@@ -96,7 +96,7 @@ const createColumns = (columns) => {
   return cols
 }
 
-const createData = (object) => {
+const createData = (object, col) => {
   let rows = []
   for (const key in object) {
     if (Object.hasOwnProperty.call(object, key)) {
@@ -117,7 +117,7 @@ const MyTable = () => {
   const [orderBy, setOrderBy] = useState(DEFAULT_ORDER_BY)
   const [selected, setSelected] = useState([])
   const [page, setPage] = useState(0)
-  const [dense, setDense] = useState(false)
+  const [dense, setDense] = useState(true)
   const [visibleRows, setVisibleRows] = useState(null)
   const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_ROWS_PER_PAGE)
   const [paddingHeight, setPaddingHeight] = useState(0)
@@ -251,24 +251,6 @@ const MyTable = () => {
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
-  const showRow = (object) => {
-    console.log('showRow', object)
-    const { _id, ...rest } = object
-
-    console.log('showRow rest', rest);
-    let row = []
-    for (const key in rest) {
-      if (Object.hasOwnProperty.call(rest, key)) {
-        const element = rest[key]
-        row = [...row, element]
-      }
-    }
-    console.log('showRow row', row);
-    return row
-  }
-
-
-
   return (
   <Box>
     <Stack
@@ -337,18 +319,14 @@ const MyTable = () => {
                         >
                           {row._id}
                         </TableCell>
-                        {showRow(row).map((item, index) => {
-                            return (
-                              <TableCell  key={index} align="right">
-                                {item}
+                        {row && columns.slice(1).map((column, index) => (
+                              <TableCell key={index} align="right">
+                                {row[column.id]}
                               </TableCell>
-                            )
-                          })
+                          ))
                         }
-
-                    
                       </TableRow>
-                    );
+                    )
                   })
                 : null}
               {paddingHeight > 0 && (
@@ -363,7 +341,7 @@ const MyTable = () => {
             </TableBody>
           </Table>
         </TableContainer>
-        {/* <TablePagination
+        <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
           count={rows.length}
@@ -371,7 +349,7 @@ const MyTable = () => {
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
-        /> */}
+        />
       </Paper>
   </Box>
   )
