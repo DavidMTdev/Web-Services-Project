@@ -15,7 +15,7 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 
 import EnhancedTableHead from '../components/EnhancedTableHead'
-
+import EnhancedTableToolbar from '../components/EnhancedTableToolbar'
 
 import { getData, getColumns } from '../api/root'
 
@@ -129,16 +129,20 @@ const MyTable = () => {
   // }, [dataLoader])
 
   useEffect(() => {
-    console.log('Table useEffect rows', rows)
-  }, [rows])
+    console.log('Table useEffect selected', selected)
+  }, [selected])
 
-  useEffect(() => {
-    console.log('Table useEffect columns', columns)
-  }, [columns])
+  // useEffect(() => {
+  //   console.log('Table useEffect rows', rows)
+  // }, [rows])
 
-  useEffect(() => {
-    console.log('Table useEffect visibleRows', visibleRows)
-  }, [visibleRows])
+  // useEffect(() => {
+  //   console.log('Table useEffect columns', columns)
+  // }, [columns])
+
+  // useEffect(() => {
+  //   console.log('Table useEffect visibleRows', visibleRows)
+  // }, [visibleRows])
 
 
   useEffect(() => {
@@ -175,7 +179,7 @@ const MyTable = () => {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelected = rows.map((n) => n.name);
+      const newSelected = visibleRows.map((n) => n._id);
       setSelected(newSelected);
       return;
     }
@@ -269,7 +273,7 @@ const MyTable = () => {
     </Stack>
 
     <Paper sx={{ width: '100%', mb: 2 }}>
-        {/* <EnhancedTableToolbar numSelected={selected.length} /> */}
+        <EnhancedTableToolbar numSelected={selected.length} />
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -283,13 +287,13 @@ const MyTable = () => {
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={rows.length}
+              rowCount={selected.length}
             />
             <TableBody>
               {visibleRows
                 ? visibleRows.map((row, index) => {
-                    const isItemSelected = isSelected(row._id);
-                    const labelId = `enhanced-table-checkbox-${index}`;
+                    const isItemSelected = isSelected(row._id)
+                    const labelId = `enhanced-table-checkbox-${index}`
 
                     return (
                       <TableRow
@@ -320,11 +324,10 @@ const MyTable = () => {
                           {row._id}
                         </TableCell>
                         {row && columns.slice(1).map((column, index) => (
-                              <TableCell key={index} align="right">
-                                {row[column.id]}
-                              </TableCell>
-                          ))
-                        }
+                          <TableCell key={index} align="right">
+                            {row[column.id]}
+                          </TableCell>
+                        ))}
                       </TableRow>
                     )
                   })
