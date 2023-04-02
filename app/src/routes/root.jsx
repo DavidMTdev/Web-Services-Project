@@ -113,6 +113,10 @@ const Root = () => {
     setOpen(false)
   }
 
+  const handleDrawerClick = () => {
+    setOpen(!open)
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault()
     // mutation.mutate(e.target[0].value)
@@ -123,9 +127,9 @@ const Root = () => {
     <AppContext.Provider value={{ data, setData }}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
-        <AppBar theme={theme} open={open} click={handleDrawerOpen} />
+        <AppBar theme={theme} open={open} click={handleDrawerClick} />
         <AppDrawer theme={theme} open={open} click={handleDrawerClose} >
-          <Stack 
+          <Box 
             component="form"
             direction="row"
             spacing={0}
@@ -133,10 +137,14 @@ const Root = () => {
             noValidate
             autoComplete="off"
             onSubmit={(e) => handleSubmit(e)}
+            
           >
-            <TextField id="outlined-basic" label="Database Name" variant="outlined" />
-            <Button type='submit' variant="contained" endIcon={<SendIcon />} />
-          </Stack >
+            {/* <TextField id="outlined-basic" label="Database Name" variant="outlined" /> */}
+            {/* <Button type='submit' variant="contained" endIcon={<SendIcon />} /> */}
+            <Button type='submit' variant="contained" sx={{ width: '100%' }}>
+              + Create Database
+            </Button>
+          </Box >
           <List
             component="nav"
             aria-labelledby="nested-list-subheader"
