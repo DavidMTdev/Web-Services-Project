@@ -18,6 +18,7 @@ import EnhancedTableHead from '../components/EnhancedTableHead'
 import EnhancedTableToolbar from '../components/EnhancedTableToolbar'
 
 import { getData, getColumns } from '../api/root'
+import { set } from 'lodash'
 
 const dataQuery = (database, table) => ({
   queryKey: [database, table, "list", "all"],
@@ -35,12 +36,23 @@ export const loader = (queryClient) => async ({ request, params}) => {
 
   const data  = queryClient.getQueryData(dataQ.queryKey)
   const columns = queryClient.getQueryData(columnsQ.queryKey)
+  let datafetchQ = {
+    data: []
+  }
+  let columnsfetchQ = {
+    columns: []
+  }
   if (!data) {
-    console.log('loader fetch')
-    return { params, data: await queryClient.fetchQuery(dataQ), columns: await queryClient.fetchQuery(columnsQ) }
+    console.log('loader fetch data')
+    datafetchQ = await queryClient.fetchQuery(dataQ)
+  }
+  if (!columns) {
+    console.log('loader fetch columns')
+    columnsfetchQ = await queryClient.fetchQuery(columnsQ)
+    // return { params, data: await queryClient.fetchQuery(dataQ), columns: await queryClient.fetchQuery(columnsQ) }
   }
 
-  return { params, data, columns }
+  return { params, data: data || datafetchQ, columns: columns || columnsfetchQ }
 }
 
 
@@ -96,7 +108,7 @@ const createColumns = (columns) => {
   return cols
 }
 
-const createData = (object, col) => {
+const createData = (object) => {
   let rows = []
   for (const key in object) {
     if (Object.hasOwnProperty.call(object, key)) {
@@ -126,11 +138,7 @@ const MyTable = () => {
 
   // useEffect(() => {
   //   console.log('Table useEffect', dataLoader)
-  // }, [dataLoader])
-
-  useEffect(() => {
-    console.log('Table useEffect selected', selected)
-  }, [selected])
+  // }, [dataLoader.params])
 
   // useEffect(() => {
   //   console.log('Table useEffect rows', rows)
@@ -140,12 +148,10 @@ const MyTable = () => {
   //   console.log('Table useEffect columns', columns)
   // }, [columns])
 
-  // useEffect(() => {
-  //   console.log('Table useEffect visibleRows', visibleRows)
-  // }, [visibleRows])
-
 
   useEffect(() => {
+    // setRows(createData(dataLoader.data?.data))
+    // setColumns(createColumns(dataLoader.columns?.columns))
     let rowsOnMount = stableSort(
       rows,
       getComparator(DEFAULT_ORDER, DEFAULT_ORDER_BY),
