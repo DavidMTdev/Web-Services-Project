@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useQueryClient, useMutation } from "@tanstack/react-query"
 
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
@@ -8,8 +9,22 @@ import ExpandMore from '@mui/icons-material/ExpandMore'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import IconButton from '@mui/material/IconButton'
 
+import { deleteDatabase } from '../api/root'
+
 const NestedListItem = ({ sx, text, click, isOpen, open, icon }) => {
+  const queryClient = useQueryClient()
   const [show, setShow] = useState(false)
+  const mutation = useMutation({
+    mutationFn: () => deleteDatabase(text),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["databases", "list", "all"])
+    }
+  })
+
+  const handleDelete = () => {
+    console.log('delete')
+    mutation.mutate()
+  }
 
   if (!open) {
     return (
@@ -47,6 +62,7 @@ const NestedListItem = ({ sx, text, click, isOpen, open, icon }) => {
                     }} 
                     aria-label="delete" 
                     size="small"
+                    onClick={() => handleDelete()}
                   >
                     <DeleteForeverIcon fontSize="inherit" />
                   </IconButton>

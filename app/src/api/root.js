@@ -14,8 +14,14 @@ export const getDatabases = async () => {
     .catch(err => console.log(err))
 }
 
-export const postDatabase = (database) => {
-    return axios.post(`${url}`, { database: database })
+export const postDatabase = (data) => {
+    return axios.post(`${url}`, { database: data.database })
+    .then(res => res.data)
+    .catch(err => console.log(err))
+}
+
+export const deleteDatabase = (database) => {
+    return axios.delete(`${url}/${database}`)
     .then(res => res.data)
     .catch(err => console.log(err))
 }
@@ -26,11 +32,17 @@ export const getTables = async (database) => {
     .catch(err => console.log(err))
 }
 
+export const postTable = (data) => {
+    return axios.post(`${url}/${data.database}`, { table: data.table })
+    .then(res => res.data)
+    .catch(err => console.log(err))
+}
+
 export const getData = async (database, table) => {
     // await new Promise((r) => setTimeout(r, 1000))
     return await axios.get(`${url}/${database}/${table}/data`)
     .then(res => res.data)
-    .catch(err => err)
+    .catch(err => console.log(err))
 }
 
 export const getColumns = async (database, table) => {

@@ -5,7 +5,7 @@ import {
   useNavigate,
   useSubmit,
 } from "react-router-dom"
-import { useQuery, useQueries, useQueryClient } from "@tanstack/react-query"
+import { useQuery, useQueries, useQueryClient, useMutation } from "@tanstack/react-query"
 
 import { useTheme } from '@mui/material/styles'
 import Box from '@mui/material/Box'
@@ -19,6 +19,13 @@ import SendIcon from '@mui/icons-material/Send'
 import Stack from '@mui/material/Stack'
 import StorageIcon from '@mui/icons-material/Storage'
 import TableRowsIcon from '@mui/icons-material/TableRows'
+import Modal from '@mui/material/Modal'
+import Typography from '@mui/material/Typography'
+import FormControl from '@mui/material/FormControl'
+import FormHelperText from '@mui/material/FormHelperText'
+import Input from '@mui/material/Input'
+import InputLabel from '@mui/material/InputLabel'
+import OutlinedInput from '@mui/material/OutlinedInput'
 
 import AppBar from '../components/AppBar'
 import AppDrawer from '../components/AppDrawer'
@@ -27,7 +34,7 @@ import NestedListItem from "../components/NestedListItem"
 import NestedListSubItem from '../components/NestListSubItem'
 
 
-import { getDatabases, getTables, postDatabase } from '../api/root'
+import { getDatabases, getTables, postDatabase, postTable } from '../api/root'
 
 const AppContext = createContext(null)
 
@@ -76,10 +83,35 @@ const Root = () => {
   const theme = useTheme()
   const queryClient = useQueryClient()
   const navigate = useNavigate()
-  const databases = queryClient.getQueryData(databasesQuery().queryKey)
+  const { data: databases } = useQuery(databasesQuery())
+  const tableQueries = useQueries({
+    queries: databases.databases.map((database) => {
+      return {
+        queryKey: tablesQuery(database).queryKey,
+        queryFn: tablesQuery(database).queryFn,
+        enabled: false,
+      }
+    })
+  })
+  // const databases = queryClient.getQueryData(databasesQuery().queryKey)
+  const mutationDB = useMutation({
+    mutationFn: (data) => postDatabase(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: databasesQuery().queryKey })
+    }
+  })
+  const mutationTable = useMutation({
+    mutationFn: (data) => postTable(data),
+    onSuccess: (variables) => {
+      console.log(variables)
+      queryClient.invalidateQueries({ queryKey: tablesQuery(variables.database).queryKey })
+    }
+  })
 
   const [open, setOpen] = useState(true)
   const [data, setData] = useState([])
+  const [openModal, setOpenModal] = useState(false)
+
 
   useEffect(() => {
     // console.log('Root useEffect', data)
@@ -119,9 +151,28 @@ const Root = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    // console.log(e.target[0].value)
+    // console.log(e.target[2].value)
+    const db = e.target[0].value
+    const tb = e.target[2].value
+
+    if (db) {
+      console.log('db', db)
+      mutationDB.mutate({ database: db})
+    }
+
+    if (tb) {
+      console.log('tb', tb)
+      mutationTable.mutate({ database: db, table: tb })
+    }
+    
+
+    // console.log(e)
     // mutation.mutate(e.target[0].value)
   }
 
+  const handleOpenModal = () => setOpenModal(true)
+  const handleCloseModal = () => setOpenModal(false)
 
   return (
     <AppContext.Provider value={{ data, setData }}>
@@ -130,6 +181,22 @@ const Root = () => {
         <AppBar theme={theme} open={open} click={handleDrawerClick} />
         <AppDrawer theme={theme} open={open} click={handleDrawerClose} >
           <Box 
+
+            direction="row"
+            spacing={0}
+            margin={2}
+          >
+            {/* <TextField id="outlined-basic" label="Database Name" variant="outlined" /> */}
+            {/* <Button type='submit' variant="contained" endIcon={<SendIcon />} /> */}
+            <Button 
+              variant="contained" 
+              sx={{ width: '100%' }}
+              onClick={handleOpenModal}
+            >
+              + Create Database
+            </Button>
+          </Box >
+          {/* <Box 
             component="form"
             direction="row"
             spacing={0}
@@ -137,14 +204,11 @@ const Root = () => {
             noValidate
             autoComplete="off"
             onSubmit={(e) => handleSubmit(e)}
-            
           >
-            {/* <TextField id="outlined-basic" label="Database Name" variant="outlined" /> */}
-            {/* <Button type='submit' variant="contained" endIcon={<SendIcon />} /> */}
             <Button type='submit' variant="contained" sx={{ width: '100%' }}>
               + Create Database
             </Button>
-          </Box >
+          </Box> */}
           <List
             component="nav"
             aria-labelledby="nested-list-subheader"
@@ -182,6 +246,51 @@ const Root = () => {
         </AppDrawer>
         <AppMain theme={theme} open={open} />
       </Box>
+
+      <Modal
+        open={openModal}
+        // onClose={handleCloseModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box 
+          component="form"
+          noValidate
+          autoComplete="off"
+          onSubmit={(e) => handleSubmit(e)}
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 400,
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+            p: 4,
+            '& > :not(style)': { my: 2 },
+          }}
+        > 
+          <Typography id="modal-modal-title" variant="h5" component="h3" mb={2}>
+            Create Database
+          </Typography>
+          <FormControl fullWidth>
+            <InputLabel htmlFor="component-simple">Database Name</InputLabel>
+            <OutlinedInput id="component-simple" placeholder="Enter database name" label="Database Name" name='database'/>
+          </FormControl>
+          <FormControl fullWidth>
+            <InputLabel htmlFor="component-outlined">Table Name</InputLabel>
+            <OutlinedInput id="component-outlined" placeholder="Enter table name" label="Table Name" name='table'/>
+          </FormControl>
+          <Stack direction="row" spacing={1} alignItems="center" justifyContent="flex-end">
+            <Button variant="contained" onClick={handleCloseModal} color="error">
+              Cancel
+            </Button>
+            <Button variant="contained" type='submit'>
+              Create
+            </Button>
+          </Stack>
+        </Box>
+      </Modal>
     </AppContext.Provider>
   )
 }
