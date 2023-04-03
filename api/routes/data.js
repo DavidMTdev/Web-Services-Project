@@ -40,6 +40,7 @@ router.get('/:database/:table/data', async (req, res) => {
 
     const verifFilter = req.url.searchParams
     const sortBy = {}
+    let thereIsFilter = false
     let tableSort = false
     let errorName = ""
 
@@ -50,6 +51,7 @@ router.get('/:database/:table/data', async (req, res) => {
         }
         let filter
         filter = value
+        thereIsFilter = true
 
         let x = filter.split(',')
         for( element in x){
@@ -81,19 +83,50 @@ router.get('/:database/:table/data', async (req, res) => {
         res.message = error
         return
     }
-
+    
     const newData = {}
-    if (sortBy != {}) {
+    if (thereIsFilter) {
         for (elem in sortBy){
+            let lookingFor
             await data.map(element => {
-                if (element.getValues()[elem] == sortBy[elem]){
+                let dataInDB = element.getValues()[elem].toString()
+                if(sortBy[elem].endsWith("*") && sortBy[elem].startsWith("*")){
+                    lookingFor = sortBy[elem].slice(1,-1)
+                    if(dataInDB.includes(lookingFor)){
+                        newData[element.getId()] = element.getValues()
+                    }
+                }
+                else if(sortBy[elem].startsWith("*")){
+                    lookingFor = sortBy[elem].slice(1, sortBy[elem].length)
+                    if(dataInDB.endsWith(lookingFor)){
+                        newData[element.getId()] = element.getValues()
+                    }   
+                }
+                else if(sortBy[elem].endsWith("*")) {
+                    lookingFor = sortBy[elem].slice(0, -1)
+                    if(dataInDB.startsWith(lookingFor)){
+                        newData[element.getId()] = element.getValues()
+                    }       
+                }
+                else if (dataInDB == sortBy[elem]){
                     newData[element.getId()] = element.getValues()
                 }
             })
         }
         for (x in newData){
             for (elem in sortBy){
-                if (newData[x][elem] != sortBy[elem]){
+                let lookingFor = sortBy[elem]
+                if(sortBy[elem].endsWith("*") && sortBy[elem].startsWith("*")){
+                    lookingFor = sortBy[elem].slice(1,-1)
+                }
+                else if(sortBy[elem].startsWith("*")){
+                    lookingFor = sortBy[elem].slice(1, sortBy[elem].length)
+                }
+                else if(sortBy[elem].endsWith("*")) {
+                    lookingFor = sortBy[elem].slice(0, -1)
+                }
+                let dataInDB = newData[x][elem].toString()
+                if (!dataInDB.includes(lookingFor)){
                     delete newData[x]
                 }
             }
@@ -102,7 +135,7 @@ router.get('/:database/:table/data', async (req, res) => {
     else{
         await data.map(element => {
             newData[element.getId()] = element.getValues()
-    })
+        })
     }
     
 
