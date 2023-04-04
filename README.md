@@ -22,48 +22,28 @@ Create web services api RESTfull
 ```http
   OPTIONS /
 ```
-<!-- #### Request :
-```http
-  curl -X OPTIONS 'http://localhost:3000'
-``` -->
 #### Response :
 | Property | Type     | Description                       |
 | :------- | :------- | :-------------------------------- |
 | `description` | `string` | Request description |
 | `methods` | `array` | List of methods |
-<!-- ```json
-  {
-    "description": "List of methods",
-    "methods": ["GET","POST"]
-  } 
-``` -->
 
 ### Get database list
 ```http
   GET /
 ```
-<!-- #### Request :
-```http
-  curl -X GET 'http://localhost:3000'
-``` -->
 #### Response :
 | Property | Type     | Description                       |
 | :------- | :------- | :-------------------------------- |
 | `description` | `string` | Request description |
 | `databases` | `array` | List of database |
-<!-- ```json
-  {
-    "description": "List of database",
-    "databases": ["cinema","Test1"]
-  } 
-``` -->
 
 ### Create database
 ```http
   POST /
   Content-Type: application/json
   {
-    "database": {database}
+    "database": ${database}
   }
 ```
 #### Request :
@@ -75,18 +55,54 @@ Create web services api RESTfull
 | :------- | :------- | :-------------------------------- |
 | `description` | `string` | Request description |
 | `database` | `string` | Database created |
-<!-- #### Request
+
+
+### Get method list of database
 ```http
-  curl -X GET 'http://localhost:3000' \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "database": "cinema"
-  }'
+  OPTIONS /${database}
 ```
-#### Response
-```json
+#### Request :
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `database` | `string` | **Required**. databas to path |
+#### Response :
+| Property | Type     | Description                       |
+| :------- | :------- | :-------------------------------- |
+| `description` | `string` | Request description |
+| `methods` | `array` | List of methods |
+
+### Get table list of database
+```http
+  GET /${database}
+```
+#### Request :
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `database` | `string` | **Required**. databas to path |
+#### Response :
+| Property | Type     | Description                       |
+| :------- | :------- | :-------------------------------- |
+| `description` | `string` | Request description |
+| `tables` | `array` | List of tables |
+
+### Create table of database
+```http
+  POST /${database}
+  Content-Type: application/json
   {
-    "description": "List of database",
-    "databases": ["cinema","company"]
-  } 
-``` -->
+    "table": ${table}
+  }
+```
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `database` | `string` | **Required**. databas to path |
+#### Request :
+
+| Property | Type     | Description                       |
+| :------- | :------- | :-------------------------------- |
+| `table` | `string` | Table name |
+#### Response :
+| Property | Type     | Description                       |
+| :------- | :------- | :-------------------------------- |
+| `description` | `string` | Request description |
+| `tables` | `array` | List of tables |
