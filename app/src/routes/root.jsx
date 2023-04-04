@@ -84,15 +84,15 @@ const Root = () => {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const { data: databases } = useQuery(databasesQuery())
-  const tableQueries = useQueries({
-    queries: databases.databases.map((database) => {
-      return {
-        queryKey: tablesQuery(database).queryKey,
-        queryFn: tablesQuery(database).queryFn,
-        enabled: false,
-      }
-    })
-  })
+  // const tableQueries = useQueries({
+  //   queries: databases.databases.map((database) => {
+  //     return {
+  //       queryKey: tablesQuery(database).queryKey,
+  //       queryFn: tablesQuery(database).queryFn,
+  //       enabled: false,
+  //     }
+  //   })
+  // })
   // const databases = queryClient.getQueryData(databasesQuery().queryKey)
   const mutationDB = useMutation({
     mutationFn: (data) => postDatabase(data),
