@@ -459,3 +459,349 @@ API RESTfull
 | Property | Type     | Description                       |
 | :------- | :------- | :-------------------------------- |
 | `description` | `string` | Request description |
+
+
+## Example
+```http
+  curl -X OPTIONS 'http://localhost:3000'
+
+  {
+    "description": "List of methods",
+    "methods": ["GET","POST"]
+  }
+```
+```http
+  curl -X GET 'http://localhost:3000'
+  
+  {
+    "description": "List of database",
+    "databases": [
+      "cinema",
+      "test"
+    ]
+  }     
+```
+```http
+  curl -X POST 'http://localhost:3000' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "database": "companies"
+  }'  
+
+  {
+    "description": "Database created",
+    "database": "companies"
+  }
+```
+```http
+  curl -X OPTIONS 'http://localhost:3000/cinema'
+
+  {
+    "description": "List of methods",
+    "Methods": ["GET", "POST", "DELETE"]
+  }
+```
+```http
+  curl -X POST 'http://localhost:3000/cinema'
+  -H 'Content-Type: application/json' \
+  -d '{
+    "table": "movies"
+  }'
+
+  {
+    "description": "Database created",
+    "table": "movies"
+  }
+```
+```http
+  curl -X GET 'http://localhost:3000/cinema' \
+
+  {
+      "description": "List of tables",
+      "tables": [
+          "movies"
+      ]
+  }
+```
+```http
+  curl -X DELETE 'http://localhost:3000/cinema'
+
+  {
+    "Description": "Database deleted",
+    "database": "cinema"
+  }
+```
+```http
+  curl -X OPTIONS 'http://localhost:3000/cinema/movies'
+
+  {
+    "description": "List of methods",
+    "methods": ["GET", "POST", "DELETE"]
+  }
+```
+```http
+  curl -X POST 'http://localhost:3000/cinema/movies' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "columns": [
+          {
+            "name":"id", 
+            "type": "int",
+            "primaryKey": true,
+            "unique": true,
+            "autoIncrement": true
+          }, 
+          {
+            "name":"title", 
+            "type": "string"
+          }, 
+          {
+            "name":"vote", 
+            "type": "int",
+            "nullable": true
+          },
+          {
+              "name": "language",
+              "type": "string"
+          },
+          {
+              "name": "budget",
+              "type": "float",
+              "nullable": true
+          }
+      ]
+  }'
+
+  {
+    "description": "Columns created",
+    "Columns": {
+        "id": {
+            "name": "id",
+            "type": "number",
+            "nullable": false,
+            "default": null,
+            "primaryKey": true,
+            "unique": true,
+            "autoIncrement": true,
+            "count": 0
+        },
+        "title": {
+            "name": "title",
+            "type": "string",
+            "nullable": false,
+            "default": null,
+            "primaryKey": false,
+            "unique": false,
+            "autoIncrement": false,
+            "count": 0
+        },
+        "vote": {
+            "name": "vote",
+            "type": "number",
+            "nullable": true,
+            "default": null,
+            "primaryKey": false,
+            "unique": false,
+            "autoIncrement": false,
+            "count": 0
+        },
+        "language": {
+            "name": "language",
+            "type": "string",
+            "nullable": false,
+            "default": null,
+            "primaryKey": false,
+            "unique": false,
+            "autoIncrement": false,
+            "count": 0
+        },
+        "budget": {
+            "name": "budget",
+            "type": "number",
+            "nullable": true,
+            "default": null,
+            "primaryKey": false,
+            "unique": false,
+            "autoIncrement": false,
+            "count": 0
+        }
+    }
+}
+```
+```http
+  curl -X DELETE 'http://localhost:3000/cinema/movies'
+
+  {
+    "description": "Table deleted",
+    "table": "movies"
+  }
+```
+```http
+  curl -X OPTIONS 'http://localhost:3000/cinema/movies/columns'
+
+  {
+    "description": "List of methods",
+    "methods": ["GET", "POST"]
+  }
+```
+```http
+  curl -X GET 'http://localhost:3000/cinema/movies/columns'
+
+  {
+    "description": "List of columns",
+    "columns": [
+        "id",
+        "title",
+        "vote",
+        "language",
+        "budget"
+    ]
+  }
+```
+```http
+  curl -X POST 'http://localhost:3000/cinema/movies/columns'
+  -H 'Content-Type: application/json' \
+  -d '{
+    "popularity": {
+      "type": "float",
+      "nullable": true,
+      "default": null,
+      "primaryKey": false,
+      "unique": false,
+      "autoIncrement": false
+    }
+  }'
+
+  {
+    "message": "Columns created"
+  }
+```
+```http
+  curl -X OPTIONS 'http://localhost:3000/cinema/movies/columns/id'
+  
+  {
+    "description": "List of methods",
+    "methods": ["GET", "PUT", "DELETE"]
+  }
+```
+```http
+  curl -X GET 'http://localhost:3000/cinema/movies/columns/id'
+  
+  {
+    "description": "List of column details",
+    "column": {
+        "name": "id",
+        "type": "number",
+        "nullable": false,
+        "default": null,
+        "primaryKey": true,
+        "unique": true,
+        "autoIncrement": true,
+        "count": 0
+    }
+  }
+```
+```http
+  curl -X PUT 'http://localhost:3000/cinema/movies/columns/title' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "default": "Default Title"
+  }'
+
+  {
+    "message": "Columns updated",
+    "column": {
+        "default": "Default Title"
+    }
+  }
+```
+```http
+  curl -X DELETE 'http://localhost:3000/cinema/movies/columns/language'
+
+  {
+    "message": "Columns deleted"
+  }
+```
+```http
+  curl -X OPTIONS 'http://localhost:3000/cinema/movies/data'
+
+  {
+    "description": "List of methods",
+    "methods": ["GET", "POST", "DELETE"]
+  }
+```
+```http
+  curl -X POST 'http://localhost:3000/cinema/movies/data'
+  -H 'Content-Type: application/json' \
+  -d '{
+    "title": "Kill Bill: Vol. 1",
+    "vote": 12820,
+    "budget": 30000000
+  }'
+
+  {
+    "message": "Data created",
+    "data": {
+        "title": "Kill Bill: Vol. 1",
+        "vote": 12820,
+        "budget": 30000000,
+        "id": 1
+    }
+  }
+```
+```http
+  curl -X GET 'http://localhost:3000/cinema/movies/data'
+
+  {
+    "description": "List of data",
+    "data": {
+        "899b30341e674c52a98615207bc99444": {
+            "title": "Kill Bill: Vol. 1",
+            "vote": 12820,
+            "budget": 30000000,
+            "id": 2
+        }
+    }
+  }
+```
+```http
+  curl -X OPTIONS 'http://localhost:3000/cinema/movies/data/899b30341e674c52a98615207bc99444'
+
+  {
+    "description": "List of methods",
+    "methods": ["GET", "PUT", "DELETE"]
+  }
+```
+```http
+  curl -X GET 'http://localhost:3000/cinema/movies/data/899b30341e674c52a98615207bc99444'
+
+  {
+    "description": "Values of Document",
+    "values": {
+        "title": "Kill Bill: Vol. 1",
+        "vote": 12820,
+        "budget": 30000000,
+        "id": 2
+    }
+  }
+```
+```http
+  curl -X PUT 'http://localhost:3000/cinema/movies/data/899b30341e674c52a98615207bc99444'
+  -H 'Content-Type: application/json' \
+  -d '{
+    "title": "Kill Bill",
+      "vote": 43762,
+      "budget": 50000000
+  }'
+
+  {
+    "description": "Document updated"
+  }
+```
+```http
+  curl -X DELETE 'http://localhost:3000/cinema/movies/data/899b30341e674c52a98615207bc99444'
+
+  {
+    "description": "Document deleted"
+  }
+```
