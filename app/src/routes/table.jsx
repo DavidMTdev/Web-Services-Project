@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { useLoaderData, useParams, Form } from 'react-router-dom'
+import { useLoaderData, useParams, useNavigate, Form } from 'react-router-dom'
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query"
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
@@ -200,6 +200,7 @@ const createData = (object) => {
 }
 
 const MyTable = () => {
+  const navigate = useNavigate()
   const params = useParams()
   // const dataLoader = useLoaderData()
   const queryClient = useQueryClient()
@@ -390,8 +391,15 @@ const MyTable = () => {
           {params.table}
       </Typography>
     </Stack>
-
-    <Paper sx={{ width: '100%', mb: 4 }}>
+    <Stack direction="row" spacing={2}>
+      <Button variant="contained" onClick={() => navigate(`/${params.database}/${params.table}/columns`)}>
+        Colmuns
+      </Button>
+      <Button variant="contained">
+        Data
+      </Button>
+    </Stack>
+    <Paper sx={{ width: '100%', my: 4 }}>
       <Form method="post" id="contact-form">
       {/* <Box
         component="form"

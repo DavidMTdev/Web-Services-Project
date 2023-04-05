@@ -58,6 +58,27 @@ app.listen(3000, async (port) => {
     console.log('Databases loaded')
 })
 
+let count = 1
+
+setInterval(() => {
+    console.log(`Saving databases... (${count})`)
+    const db = databases()
+    for (const database in db) {
+    
+        fs.mkdirSync(`data/${database}`, { recursive: true })
+        for (const table in db[database].tables) {
+
+            // const j = JSON.stringify(db[database].tables[table], null, 2)
+            // fs.writeFileSync(`data/${database}/${table}.json`, j)
+
+            const s = v8.serialize(db[database].tables[table])
+            fs.writeFileSync(`data/${database}/${table}.db`, s)
+        }
+    }
+    count++
+    console.log('Databases saved')
+}, 120000)  // 10 seconds
+
 process.on('SIGINT', async () => {
     console.log('Closing databases...')
     const db = databases()
