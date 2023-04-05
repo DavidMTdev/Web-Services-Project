@@ -56,6 +56,11 @@ export const postData = (database, table, data) => {
     .then(res => res.data)
 }
 
+export const deleteData = (database, table, id) => {
+    return axios.delete(`${url}/${database}/${table}/data/${id}`)
+    .then(res => res.data)
+}
+
 export const getColumns = async (database, table) => {
     return await axios.get(`${url}/${database}/${table}/columns`)
     .then(res => res.data)
