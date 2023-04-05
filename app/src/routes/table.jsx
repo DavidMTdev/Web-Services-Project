@@ -111,8 +111,6 @@ export const loader = (queryClient) => async ({ request, params}) => {
 
 export const action = (queryClient) => async ({ request, params }) => {
   console.log('action table.jsx')
-  // console.log(request)
-  // console.log(params)
     switch (request.method) {
       case "POST": {
         const formData = await request.formData()
@@ -124,7 +122,7 @@ export const action = (queryClient) => async ({ request, params }) => {
         }
 
         const d = await queryClient.fetchQuery(createDataQuery(params.database, params.table, data))
-        console.log(d)
+
         queryClient.invalidateQueries({ queryKey: dataQuery(params.database, params.table).queryKey })
       }
       default: {

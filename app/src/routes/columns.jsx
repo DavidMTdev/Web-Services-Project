@@ -25,7 +25,7 @@ import EnhancedTableHead from '../components/EnhancedTableHead'
 import EnhancedTableToolbar from '../components/EnhancedTableToolbar'
 
 
-import { getColumns, getColumn, deleteColumn } from '../api/root'
+import { getColumns, getColumn, deleteColumn, postColumn } from '../api/root'
 
 
 
@@ -33,12 +33,9 @@ const columnsQuery = (database, table) => ({
   queryKey: [database, table, "columns"],
   queryFn: () => getColumns(database, table),
   initialData: () => {
-    // console.log('initialData columns')
     return []
   },
   structuralSharing: (oldData, newData) => {
-    // console.log('structuralSharing columns')
-    console.log(newData)
     const data = createColumns(newData.columns)
     return [...data]
   }
@@ -48,7 +45,6 @@ const columnQuery = (database, table, column) => ({
   queryKey: [database, table, "column", column],
   queryFn: () => getColumn(database, table, column),
   initialData: () => {
-    // console.log('initialData column')
     return []
   },
   structuralSharing: (oldData, newData) => {
@@ -56,6 +52,10 @@ const columnQuery = (database, table, column) => ({
   }
 })
 
+const createColumnQuery = (database, table, data) => ({
+  queryKey: [database, table, "data", "create"],
+  queryFn: () => postColumn(database, table, data),
+})
 
 export const loader = (queryClient) => async ({ request, params}) => {
   console.log('loader columns.jsx')
@@ -70,7 +70,62 @@ export const loader = (queryClient) => async ({ request, params}) => {
 
 export const action = (queryClient) => async ({ request, params }) => {
   console.log('action table.jsx')
+    switch (request.method) {
+      case "POST": {
+        const formData = await request.formData()
+        let data = Object.fromEntries(formData)
+        for (const [key, value] of Object.entries(data)) {
+          if (data[key]) {
+            // console.log(`${key}: ${value}`)
+            if (data.default) {
+              if (data.type === "int") {
+                data.default = parseInt(value)
+              } else if (data.type === "float") {
+                data.default = parseFloat(value)
+              } else if (data.type === "bool") {
+                data.default = value.toLowerCase() === "true" ? true : false
+              } else {
+                data.default = value
+              }
+            }
 
+            data[key] = data[key].toLowerCase() === "true" ? true : data[key]
+          } else {
+            delete data[key]
+          }
+        }
+
+        const column = {
+         [data.name]: {
+            type: data.type,  
+          }
+        }
+
+        if (data.default) {
+          column[data.name].default = data.default
+        }
+        if (data.unique) {
+          column[data.name].unique = data.unique
+        }
+        if (data.autoIncrement) {
+          column[data.name].autoIncrement = data.autoIncrement
+        }
+        if (data.nullable) {
+          column[data.name].nullable = data.nullable
+        }
+        if (data.primaryKey) {
+          column[data.name].primaryKey = data.primaryKey
+        }
+
+        const d = await queryClient.fetchQuery(createColumnQuery(params.database, params.table, column))
+        queryClient.invalidateQueries({ queryKey: columnsQuery(params.database, params.table).queryKey })
+        queryClient.invalidateQueries({ queryKey: columnQuery(params.database, params.table, data.name).queryKey })
+      }
+      default: {
+        console.log('default')
+        // throw new Response("", { status: 405 })
+      }
+    }
   return { params }
 }
 
@@ -106,7 +161,7 @@ function stableSort(array, comparator) {
 
 const DEFAULT_ORDER = 'asc'
 const DEFAULT_ORDER_BY = '_id'
-const DEFAULT_ROWS_PER_PAGE = 5
+const DEFAULT_ROWS_PER_PAGE = 100
 
 const createColumns = (columns) => {
   let cols = []
@@ -158,21 +213,14 @@ const Columns = () => {
   const [dense, setDense] = useState(true)
   const [visibleRows, setVisibleRows] = useState(null)
   const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_ROWS_PER_PAGE)
-  const [paddingHeight, setPaddingHeight] = useState(0)
 
   useEffect(() => {
-    console.log('Table useEffect columns', columns)
-
     if (columns) {
       let cols = []
       columns.map((column, index) => {
         const col = queryClient.getQueryData(columnQuery(params.database, params.table, column.id).queryKey)
 
         if (col.column) {
-          console.log('col', col.column)
-          console.log('col', col.column.autoIncrement)
-
-
           const c = { 
             autoIncrement: col?.column?.autoIncrement,
             default: col?.column?.default,
@@ -192,8 +240,7 @@ const Columns = () => {
   }, [columns])
 
   useEffect(() => {
-    console.log('Table useEffect rows', rows)
-    console.log('Table useEffect headCells', headCells)
+
     let rowsOnMount = stableSort(
       rows,
       getComparator(DEFAULT_ORDER, DEFAULT_ORDER_BY),
@@ -294,34 +341,26 @@ const Columns = () => {
       <Button variant="contained" onClick={() => navigate(`/${params.database}/${params.table}/columns`)}>
         Colmuns
       </Button>
-      <Button variant="contained">
+      <Button variant="contained" onClick={() => navigate(`/${params.database}/${params.table}/data`)}>
         Data
       </Button>
     </Stack>
     <Paper sx={{ width: '100%', my: 4 }}>
       <Form method="post" id="contact-form">
-      {/* <Box
-        component="form"
-        noValidate
-        autoComplete="off"
-        onSubmit={(e) => handleSubmit(e)}
-      > */}
         <Stack direction="row" spacing={2} padding={2}>
           {headCells.map((headCell) => (
             <FormControl key={headCell.id} fullWidth variant="standard">
               <InputLabel htmlFor="component-simple">{headCell.label}</InputLabel>
               <Input id="component-simple"
-                type={headCell.numeric ? 'number' : 'text'}
+                type='text'
                 name={headCell.id}
-                required={headCell.nullable}
                />
             </FormControl>
           ))}
         </Stack>
         <Button variant="contained" type='submit' size="small" >
-          Insert Row
+          Add column
         </Button>
-      {/* </Box> */}
       </Form>
     </Paper>
 
