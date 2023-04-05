@@ -1,6 +1,11 @@
 # Web-Services-Project
 Create web services api RESTfull
 
+## Authors
+
+- [@DavidMTdev](https://github.com/DavidMTdev)
+- [@VENOCKA](https://github.com/VENOCKA)
+
 ## Features
 
 Interface client
@@ -13,7 +18,9 @@ Interface client
 - Get table
 - Delete table
 
+- Create column
 - Get column
+- Delete column
 
 - Create Data
 - Get Data
