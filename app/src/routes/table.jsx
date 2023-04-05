@@ -25,8 +25,7 @@ import Checkbox from '@mui/material/Checkbox'
 import EnhancedTableHead from '../components/EnhancedTableHead'
 import EnhancedTableToolbar from '../components/EnhancedTableToolbar'
 
-import { getData, getColumns, getColumn, postData } from '../api/root'
-import { toNumber } from 'lodash'
+import { getData, getColumns, getColumn, postData, deleteData } from '../api/root'
 
 
 const dataQuery = (database, table) => ({
@@ -57,7 +56,7 @@ const columnsQuery = (database, table) => ({
   },
   structuralSharing: (oldData, newData) => {
     // console.log('structuralSharing columns')
-    // console.log(newData)
+    console.log(newData)
     // let cols = []
     // newData.columns.map(async (column) => {
     //   console.log(column)
@@ -125,7 +124,7 @@ export const action = (queryClient) => async ({ request, params }) => {
           data[key] = parseInt(value) || value
         }
 
-        const d = queryClient.fetchQuery(createDataQuery(params.database, params.table, data))
+        const d = await queryClient.fetchQuery(createDataQuery(params.database, params.table, data))
         console.log(d)
         queryClient.invalidateQueries({ queryKey: dataQuery(params.database, params.table).queryKey })
       }
@@ -355,14 +354,22 @@ const MyTable = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log('handleSubmit', e)
+  }
 
-    // for (let index = 0; index < e.target.length; index++) {
-    //   const element = e.target[index];
-    //   console.log('element', element)
-    // }
-    // e.target.map((input) => {
-    //   console.log('input', input)
-    // })
+  const mutationDeleteData = useMutation({
+    mutationFn: (data) => deleteData(data.database, data.table, data.id),
+    onSuccess: (variables) => {
+      console.log('mutationDeleteData onSuccess', variables)
+      queryClient.invalidateQueries({ queryKey: dataQuery(params.database, params.table) })
+    }
+  })
+
+  const handleDeleteData = () => {
+    console.log('handleDeleteData', selected)
+
+    selected.map((id) => {
+      mutationDeleteData.mutate({ database: params.database, table: params.table, id })
+    })
   }
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
@@ -412,7 +419,7 @@ const MyTable = () => {
     </Paper>
 
     <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar numSelected={selected.length} click={() => handleDeleteData()} />
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
