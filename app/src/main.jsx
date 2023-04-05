@@ -15,7 +15,10 @@ import Table, {
   loader as tableLoader,
   action as tableAction,
 } from './routes/table'
-import Columns from './routes/columns'
+import Columns, {
+  loader as columnsLoader,
+  action as columnsAction,
+} from './routes/columns'
 
 const queryClient = new QueryClient()
 
@@ -40,6 +43,8 @@ const router = createBrowserRouter([
       {
         path: "/:database/:table/columns",
         element: <Columns />,
+        loader: columnsLoader(queryClient),
+        action: columnsAction(queryClient),
       },
     ],
   },

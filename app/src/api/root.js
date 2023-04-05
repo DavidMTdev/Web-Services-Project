@@ -72,3 +72,14 @@ export const getColumn = async (database, table, column) => {
     .then(res => res.data)
     .catch(err => err)
 }
+
+export const postColumn = (database, table, data) => {
+    return axios.post(`${url}/${database}/${table}/columns`, { ...data })
+    .then(res => res.data)
+}
+
+export const deleteColumn = (database, table, column) => {
+    return axios.delete(`${url}/${database}/${table}/columns/${column}`)
+    .then(res => res.data)
+}
+
