@@ -34,26 +34,46 @@ import NestedListItem from "../components/NestedListItem"
 import NestedListSubItem from '../components/NestListSubItem'
 
 
-import { getDatabases, getTables, postDatabase, postTable } from '../api/root'
+import { getDatabases, getTables, postDatabase, postTable, deleteTable } from '../api/root'
 
 const AppContext = createContext(null)
 
 const databasesQuery = () => ({
-  queryKey: ["databases", "list", "all"],
+  queryKey: ["databases"],
   queryFn: () => getDatabases(),
+  onSuccess: (data) => {
+    // console.log('onSuccess')
+    // console.log(data)
+  },
+  initialData: () => {
+    // console.log('initialData')
+    return [{ name: 'initialData', open: false, tables: []}]
+  },
+  placeholderData: () => {
+    // console.log('placeholderData')
+    return [[{ name: 'placeholderData', open: false, tables: []}]]
+  },
+  structuralSharing: (oldData, newData) => {
+    // console.log('structuralSharing')
+    const data = newData.databases.map(item => ({ name: item, open: false, tables: []}))
+    return [...data]
+  }
 })
 
 const tablesQuery = (database) => ({
-  queryKey: [database, "tables", "list", "all"],
+  queryKey: [database, "tables"],
   queryFn: () => getTables(database),
 })
 
 export const loader = (queryClient) => async ({ request }) => {
+  console.log('loader root')
   if (!queryClient.getQueryData(databasesQuery().queryKey)) {
     const data = await queryClient.fetchQuery(databasesQuery())
     data.databases.map((database) => {
       queryClient.prefetchQuery(tablesQuery(database))
     })
+
+    // databases.databases.map(item => ({ name: item, open: false, tables: []}))
   }
   return { request }
 }
@@ -103,7 +123,14 @@ const Root = () => {
   const mutationTable = useMutation({
     mutationFn: (data) => postTable(data),
     onSuccess: (variables) => {
-      console.log(variables)
+      queryClient.invalidateQueries({ queryKey: databasesQuery().queryKey })
+      queryClient.invalidateQueries({ queryKey: tablesQuery(variables.database).queryKey })
+    }
+  })
+  const mutationDeleteTable = useMutation({
+    mutationFn: (data) => deleteTable(data),
+    onSuccess: (variables) => {
+      queryClient.invalidateQueries({ queryKey: databasesQuery().queryKey })
       queryClient.invalidateQueries({ queryKey: tablesQuery(variables.database).queryKey })
     }
   })
@@ -119,13 +146,13 @@ const Root = () => {
 
   useEffect(() => {
     if (databases) {
-      setData(databases.databases.map(item => ({ name: item, open: false, tables: []})))
+      // setData(databases.databases.map(item => ({ name: item, open: false, tables: []})))
     }
   }, [databases])
 
   const handleClick = (index) => {
-    const tables = queryClient.getQueryData(tablesQuery(data[index].name).queryKey)
-    const newData = [...data]
+    const tables = queryClient.getQueryData(tablesQuery(databases[index].name).queryKey)
+    const newData = [...databases]
     newData[index].open = !newData[index].open
     let newTables = []
 
@@ -165,10 +192,13 @@ const Root = () => {
       console.log('tb', tb)
       mutationTable.mutate({ database: db, table: tb })
     }
-    
 
-    // console.log(e)
-    // mutation.mutate(e.target[0].value)
+    handleCloseModal()
+  }
+
+  const handleDeleteTable = (db, tb) => {
+    console.log('delete', db, tb)
+    mutationDeleteTable.mutate({ database: db, table: tb })
   }
 
   const handleOpenModal = () => setOpenModal(true)
@@ -186,8 +216,6 @@ const Root = () => {
             spacing={0}
             margin={2}
           >
-            {/* <TextField id="outlined-basic" label="Database Name" variant="outlined" /> */}
-            {/* <Button type='submit' variant="contained" endIcon={<SendIcon />} /> */}
             <Button 
               variant="contained" 
               sx={{ width: '100%' }}
@@ -196,19 +224,7 @@ const Root = () => {
               + Create Database
             </Button>
           </Box >
-          {/* <Box 
-            component="form"
-            direction="row"
-            spacing={0}
-            margin={2}
-            noValidate
-            autoComplete="off"
-            onSubmit={(e) => handleSubmit(e)}
-          >
-            <Button type='submit' variant="contained" sx={{ width: '100%' }}>
-              + Create Database
-            </Button>
-          </Box> */}
+  
           <List
             component="nav"
             aria-labelledby="nested-list-subheader"
@@ -216,7 +232,7 @@ const Root = () => {
           >
             <Suspense fallback={<Loading />}>
 
-              {data.map((item, index) => (
+              {databases.map((item, index) => (
                   <Box key={index} style={{ cursor: 'context-menu' }} >
 
                     <NestedListItem 
@@ -235,6 +251,7 @@ const Root = () => {
                           text={table.name} 
                           icon={<TableRowsIcon fontSize="samll" />}
                           click={() => navigate(`/${item.name}/${table.name}`)}
+                          click2={() => handleDeleteTable(item.name, table.name)}
                         /> 
                       ))}
                     </NestedListSubItem>

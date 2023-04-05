@@ -9,12 +9,12 @@ import ExpandMore from '@mui/icons-material/ExpandMore'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import IconButton from '@mui/material/IconButton'
 
-import { deleteDatabase } from '../api/root'
+import { deleteDatabase, deleteTable } from '../api/root'
 
-const NestedListItem = ({ sx, text, click, isOpen, open, icon }) => {
+const NestedListItem = ({ sx, text, click, isOpen, open, icon, click2}) => {
   const queryClient = useQueryClient()
   const [show, setShow] = useState(false)
-  const mutation = useMutation({
+  const mutationDeleteDB = useMutation({
     mutationFn: () => deleteDatabase(text),
     onSuccess: () => {
       queryClient.invalidateQueries(["databases", "list", "all"])
@@ -23,16 +23,32 @@ const NestedListItem = ({ sx, text, click, isOpen, open, icon }) => {
 
   const handleDelete = () => {
     console.log('delete')
-    mutation.mutate()
+    mutationDeleteDB.mutate()
   }
 
   if (!open) {
     return (
-      <ListItemButton sx={sx} onClick={click} >
+      <ListItemButton 
+        sx={sx} 
+        onClick={click} 
+        onMouseOver={() => setShow(true)}
+        onMouseOut={() => setShow(false)}
+      >
         <ListItemIcon>
           {icon}
         </ListItemIcon>
         <ListItemText primary={text} />
+        { show && <IconButton 
+                    sx={{
+                      opacity: 0.5,
+                    }} 
+                    aria-label="delete" 
+                    size="small"
+                    onClick={click2}
+                  >
+                    <DeleteForeverIcon fontSize="inherit" />
+                  </IconButton>
+        }
       </ListItemButton>
     )
   }

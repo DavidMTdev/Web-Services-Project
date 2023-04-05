@@ -1,60 +1,141 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { useLoaderData, useParams } from 'react-router-dom'
+import { useLoaderData, useParams, Form } from 'react-router-dom'
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query"
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableContainer from '@mui/material/TableContainer'
+import TablePagination from '@mui/material/TablePagination'
+import TableRow from '@mui/material/TableRow'
+import TableHead from '@mui/material/TableHead'
+import FormControl, { useFormControl } from '@mui/material/FormControl'
+import FormHelperText from '@mui/material/FormHelperText'
+import Input from '@mui/material/Input'
+import InputLabel from '@mui/material/InputLabel'
+import OutlinedInput from '@mui/material/OutlinedInput'
+import Button from '@mui/material/Button'
 
-import Paper from '@mui/material/Paper';
-import Checkbox from '@mui/material/Checkbox';
+import Paper from '@mui/material/Paper'
+import Checkbox from '@mui/material/Checkbox'
 
 import EnhancedTableHead from '../components/EnhancedTableHead'
 import EnhancedTableToolbar from '../components/EnhancedTableToolbar'
 
-import { getData, getColumns } from '../api/root'
-import { set } from 'lodash'
+import { getData, getColumns, getColumn, postData } from '../api/root'
+import { toNumber } from 'lodash'
+
 
 const dataQuery = (database, table) => ({
-  queryKey: [database, table, "list", "all"],
+  queryKey: [database, table, "data"],
   queryFn: () => getData(database, table),
+  initialData: () => {
+    // console.log('initialData')
+    return []
+  },
+  placeholderData: () => {
+    // console.log('placeholderData')
+    return []
+  },
+  structuralSharing: (oldData, newData) => {
+    // console.log('structuralSharing')
+    const data = createData(newData.data)
+    // console.log(data)
+    return [...data]
+  }
 })
 
 const columnsQuery = (database, table) => ({
-  queryKey: [database, table, "columns", "list", "all"],
+  queryKey: [database, table, "columns"],
   queryFn: () => getColumns(database, table),
+  initialData: () => {
+    // console.log('initialData columns')
+    return []
+  },
+  structuralSharing: (oldData, newData) => {
+    // console.log('structuralSharing columns')
+    // console.log(newData)
+    // let cols = []
+    // newData.columns.map(async (column) => {
+    //   console.log(column)
+    //   const col = await getColumn(database, table, column)
+    //   console.log(col)
+    //   cols = [...cols, col.column]
+    //   // const col = queryClient.ensureQueryData(columnQuery(database, table, column))
+      
+    // })
+    // console.log(cols)
+
+    const data = createColumns(newData.columns)
+
+    return [...data]
+  }
 })
 
+const columnQuery = (database, table, column) => ({
+  queryKey: [database, table, "column", column],
+  queryFn: () => getColumn(database, table, column),
+  initialData: () => {
+    // console.log('initialData column')
+    return []
+  },
+  structuralSharing: (oldData, newData) => {
+    // console.log('structuralSharing column')
+    // console.log(oldData)
+    // console.log(newData)
+
+    return newData
+  }
+})
+
+const createDataQuery = (database, table, data) => ({
+  queryKey: [database, table, "data", "create"],
+  queryFn: () => postData(database, table, data),
+})
+
+
 export const loader = (queryClient) => async ({ request, params}) => {
-  const dataQ = dataQuery(params.database, params.table)
-  const columnsQ = columnsQuery(params.database, params.table)
+  console.log('loader table.jsx')
+  // const dataQ = dataQuery(params.database, params.table)
+  // const columnsQ = columnsQuery(params.database, params.table)
+  const data = await queryClient.fetchQuery(dataQuery(params.database, params.table))
+  // console.log('data', data)	
+  const columns = await queryClient.fetchQuery(columnsQuery(params.database, params.table))
+  columns.columns.map((column) => {
+    queryClient.prefetchQuery(columnQuery(params.database, params.table, column))
+  })
 
-  const data  = queryClient.getQueryData(dataQ.queryKey)
-  const columns = queryClient.getQueryData(columnsQ.queryKey)
-  let datafetchQ = {
-    data: []
-  }
-  let columnsfetchQ = {
-    columns: []
-  }
-  if (!data) {
-    console.log('loader fetch data')
-    datafetchQ = await queryClient.fetchQuery(dataQ)
-  }
-  if (!columns) {
-    console.log('loader fetch columns')
-    columnsfetchQ = await queryClient.fetchQuery(columnsQ)
-    // return { params, data: await queryClient.fetchQuery(dataQ), columns: await queryClient.fetchQuery(columnsQ) }
-  }
-
-  return { params, data: data || datafetchQ, columns: columns || columnsfetchQ }
+  return { params }
 }
 
+export const action = (queryClient) => async ({ request, params }) => {
+  console.log('action table.jsx')
+  // console.log(request)
+  // console.log(params)
+    switch (request.method) {
+      case "POST": {
+        const formData = await request.formData()
+        let data = Object.fromEntries(formData)
+
+        for (const [key, value] of Object.entries(data)) {
+          console.log(`${key}: ${value}`)
+          data[key] = parseInt(value) || value
+        }
+
+        const d = queryClient.fetchQuery(createDataQuery(params.database, params.table, data))
+        console.log(d)
+        queryClient.invalidateQueries({ queryKey: dataQuery(params.database, params.table).queryKey })
+      }
+      default: {
+        console.log('default')
+        // throw new Response("", { status: 405 })
+      }
+    }
+  return { params }
+}
 
 
 function descendingComparator(a, b, orderBy) {
@@ -121,10 +202,15 @@ const createData = (object) => {
 
 const MyTable = () => {
   const params = useParams()
-  const dataLoader = useLoaderData()
-  const [rows, setRows] = useState(createData(dataLoader.data?.data))
-  const [columns, setColumns] = useState(createColumns(dataLoader.columns?.columns))
+  // const dataLoader = useLoaderData()
+  const queryClient = useQueryClient()
+  // const form = useFormControl() || {}
+  // const [rows, setRows] = useState(createData(dataLoader.data?.data))
+  // const [columns, setColumns] = useState(createColumns(dataLoader.columns?.columns))
+  const { data: rows } = useQuery(dataQuery(params.database, params.table))
+  const { data: columns } = useQuery(columnsQuery(params.database, params.table))
 
+  const [headCells, setHeadCells] = useState([])
   const [order, setOrder] = useState(DEFAULT_ORDER)
   const [orderBy, setOrderBy] = useState(DEFAULT_ORDER_BY)
   const [selected, setSelected] = useState([])
@@ -134,8 +220,6 @@ const MyTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_ROWS_PER_PAGE)
   const [paddingHeight, setPaddingHeight] = useState(0)
 
-
-
   // useEffect(() => {
   //   console.log('Table useEffect', dataLoader)
   // }, [dataLoader.params])
@@ -144,26 +228,35 @@ const MyTable = () => {
   //   console.log('Table useEffect rows', rows)
   // }, [rows])
 
-  // useEffect(() => {
-  //   console.log('Table useEffect columns', columns)
-  // }, [columns])
+  useEffect(() => {
+    // console.log('Table useEffect columns', columns)
 
+    if (columns) {
+      let cols = []
+      columns.map((column, index) => {
+        const col = queryClient.getQueryData(columnQuery(params.database, params.table, column.id).queryKey)
+        const c = { ...col?.column, ...column }
+        c.numeric = c.type === 'number' ? true : false
+        cols = [...cols, c]
+      })
+      setHeadCells(cols)
+    }
+
+  }, [columns])
 
   useEffect(() => {
-    // setRows(createData(dataLoader.data?.data))
-    // setColumns(createColumns(dataLoader.columns?.columns))
     let rowsOnMount = stableSort(
       rows,
       getComparator(DEFAULT_ORDER, DEFAULT_ORDER_BY),
-    );
+    )
 
     rowsOnMount = rowsOnMount.slice(
       0 * DEFAULT_ROWS_PER_PAGE,
       0 * DEFAULT_ROWS_PER_PAGE + DEFAULT_ROWS_PER_PAGE,
-    );
+    )
 
     setVisibleRows(rowsOnMount)
-  }, []);
+  }, [rows, columns])
 
   const handleRequestSort = useCallback(
     (event, newOrderBy) => {
@@ -255,9 +348,22 @@ const MyTable = () => {
     [order, orderBy],
   );
 
-  const handleChangeDense = (event) => {
-    setDense(event.target.checked);
-  };
+  // const handleChangeDense = (event) => {
+  //   setDense(event.target.checked);
+  // };
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    console.log('handleSubmit', e)
+
+    // for (let index = 0; index < e.target.length; index++) {
+    //   const element = e.target[index];
+    //   console.log('element', element)
+    // }
+    // e.target.map((input) => {
+    //   console.log('input', input)
+    // })
+  }
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
@@ -278,6 +384,33 @@ const MyTable = () => {
       </Typography>
     </Stack>
 
+    <Paper sx={{ width: '100%', mb: 4 }}>
+      <Form method="post" id="contact-form">
+      {/* <Box
+        component="form"
+        noValidate
+        autoComplete="off"
+        onSubmit={(e) => handleSubmit(e)}
+      > */}
+        <Stack direction="row" spacing={2} padding={2}>
+          {headCells.slice(1).map((headCell) => (
+            <FormControl key={headCell.id} fullWidth variant="standard">
+              <InputLabel htmlFor="component-simple">{headCell.label}</InputLabel>
+              <Input id="component-simple"
+                type={headCell.numeric ? 'number' : 'text'}
+                name={headCell.id}
+                required={headCell.nullable}
+               />
+            </FormControl>
+          ))}
+        </Stack>
+        <Button variant="contained" type='submit' size="small" >
+          Insert Row
+        </Button>
+      {/* </Box> */}
+      </Form>
+    </Paper>
+
     <Paper sx={{ width: '100%', mb: 2 }}>
         <EnhancedTableToolbar numSelected={selected.length} />
         <TableContainer>
@@ -287,7 +420,7 @@ const MyTable = () => {
             size={dense ? 'small' : 'medium'}
           >
             <EnhancedTableHead
-              headCells={columns}
+              headCells={headCells}
               numSelected={selected.length}
               order={order}
               orderBy={orderBy}
