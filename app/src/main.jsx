@@ -12,7 +12,8 @@ import Root, {
 } from "./routes/root"
 import Index from './routes'
 import Table, { 
-  loader as tableLoader
+  loader as tableLoader,
+  action as tableAction,
 } from './routes/table'
 
 const queryClient = new QueryClient()
@@ -33,6 +34,7 @@ const router = createBrowserRouter([
         path: "/:database/:table",
         element: <Table />,
         loader: tableLoader(queryClient),
+        action: tableAction(queryClient),
       },
     ],
   },
