@@ -250,7 +250,7 @@ const Root = () => {
                           sx={{ pl: 4 }} 
                           text={table.name} 
                           icon={<TableRowsIcon fontSize="samll" />}
-                          click={() => navigate(`/${item.name}/${table.name}`)}
+                          click={() => navigate(`/${item.name}/${table.name}/data`)}
                           click2={() => handleDeleteTable(item.name, table.name)}
                         /> 
                       ))}

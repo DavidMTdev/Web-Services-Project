@@ -37,7 +37,7 @@ const EnhancedTableToolbar = ({ numSelected, click }) =>	 {
         id="tableTitle"
         component="div"
       >
-        Nutrition
+        Data
       </Typography>
     )}
 
