@@ -31,17 +31,13 @@ const dataQuery = (database, table) => ({
   queryKey: [database, table, "data"],
   queryFn: () => getData(database, table),
   initialData: () => {
-    // console.log('initialData')
     return []
   },
   placeholderData: () => {
-    // console.log('placeholderData')
     return []
   },
   structuralSharing: (oldData, newData) => {
-    // console.log('structuralSharing')
     const data = createData(newData.data)
-    // console.log(data)
     return [...data]
   }
 })
@@ -50,25 +46,10 @@ const columnsQuery = (database, table) => ({
   queryKey: [database, table, "columns"],
   queryFn: () => getColumns(database, table),
   initialData: () => {
-    // console.log('initialData columns')
     return []
   },
   structuralSharing: (oldData, newData) => {
-    // console.log('structuralSharing columns')
-    console.log(newData)
-    // let cols = []
-    // newData.columns.map(async (column) => {
-    //   console.log(column)
-    //   const col = await getColumn(database, table, column)
-    //   console.log(col)
-    //   cols = [...cols, col.column]
-    //   // const col = queryClient.ensureQueryData(columnQuery(database, table, column))
-      
-    // })
-    // console.log(cols)
-
     const data = createColumns(newData.columns)
-
     return [...data]
   }
 })
@@ -77,14 +58,9 @@ const columnQuery = (database, table, column) => ({
   queryKey: [database, table, "column", column],
   queryFn: () => getColumn(database, table, column),
   initialData: () => {
-    // console.log('initialData column')
     return []
   },
   structuralSharing: (oldData, newData) => {
-    // console.log('structuralSharing column')
-    // console.log(oldData)
-    // console.log(newData)
-
     return newData
   }
 })
@@ -97,10 +73,7 @@ const createDataQuery = (database, table, data) => ({
 
 export const loader = (queryClient) => async ({ request, params}) => {
   console.log('loader table.jsx')
-  // const dataQ = dataQuery(params.database, params.table)
-  // const columnsQ = columnsQuery(params.database, params.table)
   const data = await queryClient.fetchQuery(dataQuery(params.database, params.table))
-  // console.log('data', data)	
   const columns = await queryClient.fetchQuery(columnsQuery(params.database, params.table))
   columns.columns.map((column) => {
     queryClient.prefetchQuery(columnQuery(params.database, params.table, column))
@@ -165,7 +138,7 @@ function stableSort(array, comparator) {
 
 const DEFAULT_ORDER = 'asc'
 const DEFAULT_ORDER_BY = '_id'
-const DEFAULT_ROWS_PER_PAGE = 5
+const DEFAULT_ROWS_PER_PAGE = 50
 
 const createColumns = (columns) => {
   let cols = [{
@@ -201,9 +174,7 @@ const MyTable = () => {
   const params = useParams()
   // const dataLoader = useLoaderData()
   const queryClient = useQueryClient()
-  // const form = useFormControl() || {}
-  // const [rows, setRows] = useState(createData(dataLoader.data?.data))
-  // const [columns, setColumns] = useState(createColumns(dataLoader.columns?.columns))
+
   const { data: rows } = useQuery(dataQuery(params.database, params.table))
   const { data: columns } = useQuery(columnsQuery(params.database, params.table))
 
@@ -217,17 +188,8 @@ const MyTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_ROWS_PER_PAGE)
   const [paddingHeight, setPaddingHeight] = useState(0)
 
-  // useEffect(() => {
-  //   console.log('Table useEffect', dataLoader)
-  // }, [dataLoader.params])
-
-  // useEffect(() => {
-  //   console.log('Table useEffect rows', rows)
-  // }, [rows])
 
   useEffect(() => {
-    // console.log('Table useEffect columns', columns)
-
     if (columns) {
       let cols = []
       columns.map((column, index) => {
@@ -345,10 +307,6 @@ const MyTable = () => {
     [order, orderBy],
   );
 
-  // const handleChangeDense = (event) => {
-  //   setDense(event.target.checked);
-  // };
-
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log('handleSubmit', e)
@@ -398,12 +356,6 @@ const MyTable = () => {
     </Stack>
     <Paper sx={{ width: '100%', my: 4 }}>
       <Form method="post" id="contact-form">
-      {/* <Box
-        component="form"
-        noValidate
-        autoComplete="off"
-        onSubmit={(e) => handleSubmit(e)}
-      > */}
         <Stack direction="row" spacing={2} padding={2}>
           {headCells.slice(1).map((headCell) => (
             <FormControl key={headCell.id} fullWidth variant="standard">
@@ -419,7 +371,6 @@ const MyTable = () => {
         <Button variant="contained" type='submit' size="small" >
           Insert Row
         </Button>
-      {/* </Box> */}
       </Form>
     </Paper>
 
@@ -496,7 +447,7 @@ const MyTable = () => {
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
+          rowsPerPageOptions={[5, 10, 25, 50, 100]}
           component="div"
           count={rows.length}
           rowsPerPage={rowsPerPage}

@@ -50,7 +50,7 @@ class ServerHttp {
         }
 
         if (route) {
-            console.log(route)
+            // console.log(route)
             await req.on('data', chunk => {
                 request.body = JSON.parse(chunk.toString())
             })
