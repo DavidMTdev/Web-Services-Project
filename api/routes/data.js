@@ -1,5 +1,6 @@
 const Router = require('../lib/router')
 const { databases } = require('../db')
+const { log } = require('console')
 
 const router = new Router()
 
@@ -116,18 +117,47 @@ router.get('/:database/:table/data', async (req, res) => {
         for (x in newData){
             for (elem in sortBy){
                 let lookingFor = sortBy[elem]
-                if(sortBy[elem].endsWith("*") && sortBy[elem].startsWith("*")){
-                    lookingFor = sortBy[elem].slice(1,-1)
-                }
-                else if(sortBy[elem].startsWith("*")){
-                    lookingFor = sortBy[elem].slice(1, sortBy[elem].length)
-                }
-                else if(sortBy[elem].endsWith("*")) {
-                    lookingFor = sortBy[elem].slice(0, -1)
-                }
-                let dataInDB = newData[x][elem].toString()
-                if (!dataInDB.includes(lookingFor)){
-                    delete newData[x]
+                let filter2 = ""
+                if (newData[x] != null){
+                    console.log(newData[x])
+                    if(sortBy[elem].endsWith("*") && sortBy[elem].startsWith("*")){
+                        lookingFor = sortBy[elem].slice(1,-1)
+                        filter2 = "both"
+                    }
+                    else if(sortBy[elem].startsWith("*")){
+                        lookingFor = sortBy[elem].slice(1, sortBy[elem].length)
+                        filter2 = "start"
+                    }
+                    else if(sortBy[elem].endsWith("*")) {
+                        lookingFor = sortBy[elem].slice(0, -1)
+                        filter2 = "ends"
+                    }
+                    let dataInDB = newData[x][elem].toString()
+                    switch (filter2) {
+                        case "both":
+                            if (!dataInDB.includes(lookingFor)){
+                                delete newData[x]
+                            }
+                            break;
+
+                        case "start":
+                            if (!dataInDB.endsWith(lookingFor)){
+                                delete newData[x]
+                            }
+                            break;
+
+                        case "ends":
+                            if (!dataInDB.startsWith(lookingFor)){
+                                delete newData[x]
+                            }
+                            break;
+                    
+                        default:
+                            if (!dataInDB.includes(lookingFor)){
+                                delete newData[x]
+                            }
+                            break;
+                    }
                 }
             }
         }
